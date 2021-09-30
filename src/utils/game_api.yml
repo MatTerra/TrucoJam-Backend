@@ -1,0 +1,317 @@
+swagger: "2.0"
+info:
+  description: Game API
+  version: "1.0.0"
+  title: Game API
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+basePath: "/v1/game"
+
+paths:
+  /health:
+    get:
+      operationId: utils.controller.game_api.probe
+      tags:
+        - "Game"
+      summary: "Status check"
+      description: "Verifies if the API is ready."
+      responses:
+        200:
+          description: "API ready"
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  available:
+                    type: integer
+        500:
+          description: "API not ready"
+
+  /:
+    get:
+      operationId: utils.controller.game_api.read
+      security:
+        - jwt: ['secret']
+
+      tags:
+        - "Game"
+      parameters:
+        - name: length
+          in: query
+          type: integer
+          required: false
+          description: "Amount of game to select"
+        - name: offset
+          in: query
+          type: integer
+          required: false
+          description: "Amount of game to skip"
+        - name: id_
+          in: query
+          type: string
+          required: false
+        - name: creation_datetime
+          in: query
+          type: string
+          required: false
+        - name: last_modified_datetime
+          in: query
+          type: string
+          required: false
+        - name: pontuacao
+          in: query
+          type: string
+          required: false
+        - name: senha
+          in: query
+          type: string
+          required: false
+        - name: times
+          in: query
+          type: string
+          required: false
+        - name: partidas
+          in: query
+          type: string
+          required: false
+      summary: "Lists all Game available"
+      description: |
+        "Lists all Game in the database. May be filtered by all fields."
+      responses:
+        200:
+          description: "Available Game"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  results:
+                    type: array
+                    properties:
+                      entities:
+                        type: object
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+    post:
+      operationId: utils.controller.game_api.create
+      security:
+        - jwt: ['secret']
+
+      tags:
+        - "Game"
+      parameters:
+        - name: entity
+          in: body
+          schema:
+            type: object
+          required: true
+          description: "Game to add"
+      summary: "Create a new Game."
+      description: |
+        "Creates a new Game in the database"
+      responses:
+        201:
+          description: "Game created"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /{id_}:
+    get:
+      operationId: utils.controller.game_api.read_one
+      security:
+        - jwt: ['secret']
+
+      tags:
+        - "Game"
+      parameters:
+        - name: id_
+          in: path
+          type: string
+          required: true
+          description: "Id of game to select"
+      summary: "Recover game"
+      description: |
+        "Select game by Id"
+      responses:
+        201:
+          description: "Game"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+    put:
+      operationId: utils.controller.game_api.update
+      security:
+        - jwt: ['secret']
+
+      tags:
+        - "Game"
+      parameters:
+        - name: id_
+          in: path
+          type: string
+          required: true
+          description: "Id of game to select"
+        - name: entity
+          in: body
+          schema:
+            type: object
+          required: true
+          description: "Game to add"
+      summary: "Update Game"
+      description: |
+        "Update Game in database."
+      responses:
+        200:
+          description: "Game"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+    delete:
+      operationId: utils.controller.game_api.delete
+      security:
+        - jwt: ['secret']
+
+      tags:
+        - "Game"
+      parameters:
+        - name: id_
+          in: path
+          type: string
+          required: true
+          description: "Id of game to select"
+      summary: "Delete Game"
+      description: |
+        "Delete Game in database."
+      responses:
+        200:
+          description: "Game"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+securityDefinitions:
+  jwt:
+    type: apiKey
+    name: Authorization
+    in: header
+    x-authentication-scheme: Bearer
+    x-bearerInfoFunc: nova_api.auth.decode_jwt_token
