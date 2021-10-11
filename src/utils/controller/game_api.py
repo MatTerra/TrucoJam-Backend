@@ -1,7 +1,7 @@
 from dataclasses import fields
 
-from nova_api import error_response, success_response, use_dao
 from nova_api.dao.mongo_dao import MongoDAO
+from nova_api import error_response, success_response, use_dao
 
 from utils.database.game_dao import GameDAO
 from utils.entity.game import Game
@@ -19,15 +19,17 @@ def read(length: int = 20, offset: int = 0,
          dao: MongoDAO = None, **kwargs):
     filters = dict()
 
-    entity_attributes = [field.name for field in fields(Game)]
+    # entity_attributes = [field.name for field in fields(Game)]
 
-    for key, value in kwargs.items():
-        if key not in entity_attributes:
-            continue
-
-        filters[key] = value.split(',') \
-                       if len(str(value).split(',')) > 1 \
-                       else value
+    # for key, value in kwargs.items():
+    #     if key not in entity_attributes:
+    #         continue
+    #
+    #     filters[key] = value.split(',', 1) \
+    #         if str(value).count(',') >= 1 \
+    #            and str(value).split(',')[0] \
+    #            in dao.ALLOWED_COMPARATORS \
+    #         else value
 
     total, results = dao.get_all(length=length, offset=offset,
                                  filters=filters if filters else None)
@@ -56,7 +58,8 @@ def create(entity: dict, dao: MongoDAO = None):
 
     dao.create(entity=entity_to_create)
 
-    return success_response(message="Game created",
+    return success_response(status_code=201,
+                            message="Game created",
                             data={"Game": dict(entity_to_create)})
 
 

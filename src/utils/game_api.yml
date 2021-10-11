@@ -13,7 +13,7 @@ basePath: "/v1/game"
 paths:
   /health:
     get:
-      operationId: utils.controller.game_api.probe
+      operationId: game_api.probe
       tags:
         - "Game"
       summary: "Status check"
@@ -36,10 +36,7 @@ paths:
 
   /:
     get:
-      operationId: utils.controller.game_api.read
-      security:
-        - jwt: ['secret']
-
+      operationId: game_api.read
       tags:
         - "Game"
       parameters:
@@ -119,10 +116,7 @@ paths:
                   error:
                     type: string
     post:
-      operationId: utils.controller.game_api.create
-      security:
-        - jwt: ['secret']
-
+      operationId: game_api.create
       tags:
         - "Game"
       parameters:
@@ -167,10 +161,7 @@ paths:
 
   /{id_}:
     get:
-      operationId: utils.controller.game_api.read_one
-      security:
-        - jwt: ['secret']
-
+      operationId: game_api.read_one
       tags:
         - "Game"
       parameters:
@@ -212,10 +203,7 @@ paths:
                   error:
                     type: string
     put:
-      operationId: utils.controller.game_api.update
-      security:
-        - jwt: ['secret']
-
+      operationId: game_api.update
       tags:
         - "Game"
       parameters:
@@ -263,10 +251,7 @@ paths:
                   error:
                     type: string
     delete:
-      operationId: utils.controller.game_api.delete
-      security:
-        - jwt: ['secret']
-
+      operationId: game_api.delete
       tags:
         - "Game"
       parameters:
@@ -307,11 +292,3 @@ paths:
                 properties:
                   error:
                     type: string
-
-securityDefinitions:
-  jwt:
-    type: apiKey
-    name: Authorization
-    in: header
-    x-authentication-scheme: Bearer
-    x-bearerInfoFunc: nova_api.auth.decode_jwt_token
