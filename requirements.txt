@@ -2,3 +2,5 @@ NovaAPI[mongo]==0.2.0
 pytest
 pytest-mock
 uwsgi
+flask
+werkzeug>=2.0
