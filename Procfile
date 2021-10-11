@@ -1,0 +1,1 @@
+web: cp -r src/* . && uwsgi app.ini
