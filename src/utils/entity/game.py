@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from enum import Enum
 
 from nova_api.entity import Entity
 
@@ -8,7 +9,13 @@ def pontuacao_vazia():
 
 
 def times_vazios():
-    return [0, 0]
+    return [[], []]
+
+
+class GameStatus(Enum):
+    AguardandoJogadores = 0
+    Jogando = 1
+    Encerrado = 2
 
 
 @dataclass
@@ -17,3 +24,4 @@ class Game(Entity):
     senha: str = ""
     times: list = field(default_factory=times_vazios)
     partidas: list = field(default_factory=list)
+    status: GameStatus = GameStatus.AguardandoJogadores
