@@ -13,7 +13,7 @@ basePath: "/v1/game"
 paths:
   /health:
     get:
-      operationId: game_api.probe
+      operationId: utils.controller.game_api.probe
       tags:
         - "Game"
       summary: "Status check"
@@ -36,7 +36,7 @@ paths:
 
   /:
     get:
-      operationId: game_api.read
+      operationId: utils.controller.game_api.read
       tags:
         - "Game"
       parameters:
@@ -116,7 +116,7 @@ paths:
                   error:
                     type: string
     post:
-      operationId: game_api.create
+      operationId: utils.controller.game_api.create
       tags:
         - "Game"
       parameters:
@@ -161,7 +161,7 @@ paths:
 
   /{id_}:
     get:
-      operationId: game_api.read_one
+      operationId: utils.controller.game_api.read_one
       tags:
         - "Game"
       parameters:
@@ -203,7 +203,7 @@ paths:
                   error:
                     type: string
     put:
-      operationId: game_api.update
+      operationId: utils.controller.game_api.update
       tags:
         - "Game"
       parameters:
@@ -251,7 +251,7 @@ paths:
                   error:
                     type: string
     delete:
-      operationId: game_api.delete
+      operationId: utils.controller.game_api.delete
       tags:
         - "Game"
       parameters:
