@@ -1,0 +1,247 @@
+name: TrucoJAM-Backend CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ * ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: List changed files
+        id: files
+        uses: jitterbit/get-changed-files@v1
+
+      - name: Check if python files have changed
+        id: files-changed
+        continue-on-error: true
+        env:
+          FILES: ${{ steps.files.outputs.all }}
+        run: |
+          if [[ $(python3 -c 'from os import environ;import sys;files=environ.get("FILES", "").split();files=[f for f in files if ".py" in f];print(len(files))') -gt 0 ]];
+          then
+            echo '::set-output name=result::true'
+          else
+            echo '::set-output name=result::false'
+          fi
+
+      - uses: actions/checkout@v2
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+
+      - name: Set up Python 3.9
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Cache dependencies
+        id: dependencies-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/pip
+          key: ${{ runner.os }}-dep-3.9-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Install dependencies
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install pylint
+          if [ -f requirements.txt ]; then pip3 install -r requirements.txt; fi
+
+      - name: Lint with pylint
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+        run: |
+          mkdir -p reports
+          pylint src --rcfile=standard.rc -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > reports/lint_report
+
+      - name: Save pylint report
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: pylint-report
+          path: reports/lint_report
+
+      - name: Check files ending with newline
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+        run: |
+          function file_ends_with_newline() {
+            if [ ! -s "$1" ]; then
+              return 0
+            else
+              [[ $(tail -c2 "$1" | wc -l) -gt 0 ]]
+            fi
+          }
+
+          function check_files() {
+            for folder in $1/*; do
+              if [ -d $folder ]; then
+                check_files $folder
+              elif [ -f $folder ] && [ ${folder: -3} == ".py" ]; then
+                if ! file_ends_with_newline $folder; then
+                  echo $folder
+                  exit 1
+                fi
+              fi
+            done
+          }
+          check_files $(pwd)/src
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: List changed files
+        id: files
+        uses: jitterbit/get-changed-files@v1
+
+      - name: Check if python files have changed
+        id: files-changed
+        continue-on-error: true
+        env:
+          FILES: ${{ steps.files.outputs.all }}
+        run: |
+          if [[ $(python3 -c 'from os import environ;import sys;files=environ.get("FILES", "").split();files=[f for f in files if ".py" in f or ".yaml" in f or ".yml" in f];print(len(files))') -gt 0 ]];
+          then
+            echo '::set-output name=result::true'
+          else
+            echo '::set-output name=result::false'
+          fi
+
+      - uses: actions/checkout@v2
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+
+      - name: Cache dependencies
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+        id: dependencies-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/pip
+          key: ${{ runner.os }}-dep-3.9-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Set up Python 3.9
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install pytest
+          if [ -f requirements.txt ]; then pip3 install -r requirements.txt; fi
+
+#      - name: Start database for integration testing
+#        if: ${{ steps.files-changed.outputs.result == 'true' }}
+#        env:
+#          DOCKER_PASSWORD: ${{ secrets. }}
+#        run: |
+#          cd tests
+#          docker login -u _json_key -p "$DOCKER_PASSWORD" https://gcr.io
+#          docker-compose up -d
+#          cd ..
+
+      - name: (Unit)Test with pytest
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/src
+
+          mkdir xunit-reports
+          mkdir coverage-reports
+          pytest --junitxml=xunit-reports/xunit-result.xml --cov=utils --cov-report xml:coverage-reports/coverage.xml  tests/unittests
+
+      - name: Cache lint results
+        if: ${{ steps.files-changed.outputs.result == 'true' }}
+        id: lint-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            reports
+          key: ${{ runner.os }}-lint-source-${{ hashFiles('src/**.py') }}
+
+#      - name: Scan with Sonar
+#        if: ${{ steps.files-changed.outputs.result == 'true' }}
+#        uses: sonarsource/sonarcloud-github-action@master
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          SONAR_TOKEN: ${{ secrets. }}
+#        with:
+#          args: >
+#            -Dsonar.host.url=
+#            -Dsonar.projectKey=
+#            -Dsonar.python.coverage.reportPaths=coverage-reports/coverage.xml
+#            -Dsonar.python.xunit.reportPath=xunit-reports/xunit-result.xml
+#            -Dsonar.python.pylint.reportPaths=reports/lint_report
+#            -Dsonar.sources=./src
+#            -Dsonar.sourceEncoding=UTF-8
+#            -Dsonar.exclusions=__pycache__
+#
+#      - name: Wait for PostgreSQL and RabbitMQ
+#        if: ${{ steps.files-changed.outputs.result == 'true' }}
+#        timeout-minutes: 2
+#        run: |
+#          export PYTHONPATH=$PYTHONPATH:$(pwd)/backend/tag_processor
+#
+#          function rabbit_ready(){
+#            export RABBIT_URL=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' tests_rabbitmq_1)
+#
+#            python tests/check_rabbit.py
+#          }
+#          until rabbit_ready; do
+#            >&2 echo 'Waiting for rabbitmq to become available...'
+#            sleep 2
+#          done
+#          >&2 echo 'RabbitMQ is available'
+#
+#          function postgres_ready(){
+#            export DB_URL=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' tests_postgres_1)
+#
+#            python tests/check_postgres.py
+#          }
+#          until postgres_ready; do
+#            >&2 echo 'Waiting for postgres database to become available...'
+#            sleep 2
+#          done
+#          >&2 echo 'PostgreSQL is available'
+#
+#      - name: Wait for Processor API
+#        if: ${{ steps.files-changed.outputs.result == 'true' }}
+#        timeout-minutes: 1
+#        run: |
+#          export PYTHONPATH=$PYTHONPATH:$(pwd)/src
+#          export LOG_CONFIG_FILE=$(pwd)/src/logging.yml
+#          export DB_URL=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' tests_postgres_1)
+#          export RABBIT_URL=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' tests_rabbitmq_1)
+#          export PORT=8080
+#          export APIS=$(pwd)/src/processor_api.yml
+#          export NOVAAPI_DEBUG=1
+#          python -c 'from utils.database.BaseProcessorDAO import BaseProcessorDAO;dao=BaseProcessorDAO();dao.create_table_if_not_exists()'
+#
+#          python tests/server.py &
+#          sleep 2
+#
+#          until curl localhost:8080/v2/processor/health --fail -s; do
+#            >&2 echo 'Waiting for API to become available...'
+#            sleep 2
+#          done
+#          >&2 echo 'API is available'
+#
+#      - uses: matt-ball/newman-action@master
+#        if: ${{ steps.files-changed.outputs.result == 'true' }}
+#        with:
+#          collection: tests/endToEnd/ProcessorAPI.postman_collection.json
+#          environment: tests/endToEnd/ProcessorAPI.postman_environment.json
+#          bail: true
+#
+#      - uses: matt-ball/newman-action@master
+#        if: ${{ steps.files-changed.outputs.result == 'true' }}
+#        with:
+#          collection: tests/endToEnd/ProcessorOperatorsAPI.postman_collection.json
+#          environment: tests/endToEnd/ProcessorAPI.postman_environment.json
+#          bail: true
