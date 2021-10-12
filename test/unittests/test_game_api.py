@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Type
 from unittest.mock import Mock
 
@@ -25,13 +26,24 @@ class TestGameAPI:
 
     @staticmethod
     def test_read_empty(dao_mock):
-        res = game_api.read.__wrapped__(dao=dao_mock)
+        res = game_api.read.__wrapped__(
+            dao=dao_mock,
+            token_info={
+                "iat": datetime.now().timestamp(),
+                "exp": (datetime.now() + timedelta(1.0)).timestamp()
+            })
         assert res == (200, "List of game", {"total": 0, "results": []})
 
     @staticmethod
     def test_read_with_one(dao_mock: Mock, game: Game):
         dao_mock.get_all.return_value = 1, [game]
-        res = game_api.read.__wrapped__(dao=dao_mock)
+        res = game_api.read.__wrapped__(
+            dao=dao_mock,
+            token_info={
+                "iat": datetime.now().timestamp(),
+                "exp": (datetime.now() + timedelta(1.0)).timestamp()
+            }
+        )
         assert res == (200, "List of game", {"total": 1, "results": [
             dict(game)
         ]})
@@ -40,7 +52,12 @@ class TestGameAPI:
     @staticmethod
     def test_read_with_limit(dao_mock: Mock, game: Game):
         dao_mock.get_all.return_value = 1, [game]
-        res = game_api.read.__wrapped__(length=2, dao=dao_mock)
+        res = game_api.read.__wrapped__(
+            length=2, dao=dao_mock, token_info={
+                "iat": datetime.now().timestamp(),
+                "exp": (datetime.now() + timedelta(1.0)).timestamp()
+            }
+        )
         assert res == (200, "List of game", {"total": 1, "results": [
             dict(game)
         ]})
@@ -49,7 +66,11 @@ class TestGameAPI:
     @staticmethod
     def test_read_with_offset(dao_mock: Mock, game: Game):
         dao_mock.get_all.return_value = 3, [game]
-        res = game_api.read.__wrapped__(offset=2, dao=dao_mock)
+        res = game_api.read.__wrapped__(
+            offset=2, dao=dao_mock,token_info={
+                "iat": datetime.now().timestamp(),
+                "exp": (datetime.now() + timedelta(1.0)).timestamp()
+            })
         assert res == (200, "List of game", {"total": 3, "results": [
             dict(game)
         ]})

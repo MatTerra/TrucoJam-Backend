@@ -21,9 +21,8 @@ def probe(dao: MongoDAO = None):
     return success_response(message="API Ready",
                             data={"available": total})
 
-
-@validate_jwt_claims(claims={}, add_token_info=True)
 @use_dao(GameDAO, "Unable to list game")
+@validate_jwt_claims(claims={}, add_token_info=True)
 def read(length: int = 20, offset: int = 0,
          # pylint: disable=W0613
          dao: MongoDAO = None, token_info: dict = None, **kwargs):
