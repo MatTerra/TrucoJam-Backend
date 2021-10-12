@@ -5,6 +5,9 @@ from os import environ
 
 import connexion
 import requests
+from cryptography.hazmat.bindings._rust.x509 import load_pem_x509_certificate
+from cryptography.hazmat.primitives._serialization import Encoding, \
+    PublicFormat
 from flask_cors import CORS
 import nova_api
 
@@ -34,7 +37,14 @@ r = requests.get(
     "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
 )
 if r.ok:
-    nova_api.auth.JWT_SECRET = r.json()
+    certs = r.json()
+    for cert_id in certs:
+        cert_public_key = load_pem_x509_certificate(certs[cert_id]).public_key()
+        certs[cert_id] = cert_public_key.public_bytes(
+            encoding=Encoding.PEM,
+            format=PublicFormat.SubjectPublicKeyInfo
+        )
+    nova_api.auth.JWT_SECRET = certs
 
 print("Full setup")
 
