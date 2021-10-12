@@ -157,7 +157,7 @@ jobs:
 
           mkdir xunit-reports
           mkdir coverage-reports
-          pytest --junitxml=xunit-reports/xunit-result.xml --cov=utils --cov-report xml:coverage-reports/coverage.xml  tests/unittests
+          pytest --junitxml=xunit-reports/xunit-result.xml --cov=utils --cov-report xml:coverage-reports/coverage.xml  test/unittests
 
       - name: Cache lint results
         if: ${{ steps.files-changed.outputs.result == 'true' }}
