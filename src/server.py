@@ -9,6 +9,7 @@ from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from cryptography.x509 import load_pem_x509_certificate
 from flask_cors import CORS
 import nova_api
+import nova_api.auth
 
 debug = environ.get('DEBUG') or '0'
 if debug == '0':
@@ -38,8 +39,10 @@ r = requests.get(
 if r.ok:
     certs = r.json()
     for cert_id in certs:
-        cert_public_key = load_pem_x509_certificate(certs[cert_id])\
-            .public_key()
+        cert_public_key = load_pem_x509_certificate(
+            certs[cert_id].encode("utf8")
+        ).public_key()
+
         certs[cert_id] = cert_public_key.public_bytes(
             encoding=Encoding.PEM,
             format=PublicFormat.SubjectPublicKeyInfo
@@ -47,6 +50,7 @@ if r.ok:
     nova_api.auth.JWT_SECRET = certs
 
 print("Full setup")
+print("Keys are: ", nova_api.auth.JWT_SECRET)
 
 # If we're running in stand alone mode, run the application
 if __name__ == '__main__':
