@@ -8,6 +8,11 @@ from nova_api import error_response, success_response, use_dao
 from utils.database.game_dao import GameDAO
 from utils.entity.game import Game
 
+TRUCOJAM_BASE_CLAIMS = {
+    "iss": "https://securetoken.google.com/trucojam",
+    "aud": "trucojam"
+}
+
 
 @use_dao(GameDAO, "API Unavailable")
 def probe(dao: MongoDAO = None):
@@ -23,10 +28,7 @@ def probe(dao: MongoDAO = None):
 
 
 @use_dao(GameDAO, "Unable to list game")
-@validate_jwt_claims(claims={
-    "iss": "https://securetoken.google.com/trucojam",
-    "aud": "trucojam"
-}, add_token_info=True)
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
 def read(length: int = 20, offset: int = 0,
          # pylint: disable=W0613
          dao: MongoDAO = None, token_info: dict = None, **kwargs):

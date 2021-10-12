@@ -7,6 +7,13 @@ from pytest import fixture, raises
 from utils.controller import game_api
 from utils.entity.game import Game
 
+TOKEN_INFO = {
+    "iat": datetime.now().timestamp(),
+    "exp": (datetime.now() + timedelta(1.0)).timestamp(),
+    "iss": "https://securetoken.google.com/trucojam",
+    "aud": "trucojam"
+}
+
 
 def raise_exception(exc_type: Type[Exception] = Exception):
     raise exc_type()
@@ -28,10 +35,7 @@ class TestGameAPI:
     def test_read_empty(dao_mock):
         res = game_api.read.__wrapped__(
             dao=dao_mock,
-            token_info={
-                "iat": datetime.now().timestamp(),
-                "exp": (datetime.now() + timedelta(1.0)).timestamp()
-            })
+            token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 0, "results": []})
 
     @staticmethod
@@ -39,11 +43,7 @@ class TestGameAPI:
         dao_mock.get_all.return_value = 1, [game]
         res = game_api.read.__wrapped__(
             dao=dao_mock,
-            token_info={
-                "iat": datetime.now().timestamp(),
-                "exp": (datetime.now() + timedelta(1.0)).timestamp()
-            }
-        )
+            token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 1, "results": [
             dict(game)
         ]})
@@ -53,11 +53,7 @@ class TestGameAPI:
     def test_read_with_limit(dao_mock: Mock, game: Game):
         dao_mock.get_all.return_value = 1, [game]
         res = game_api.read.__wrapped__(
-            length=2, dao=dao_mock, token_info={
-                "iat": datetime.now().timestamp(),
-                "exp": (datetime.now() + timedelta(1.0)).timestamp()
-            }
-        )
+            length=2, dao=dao_mock, token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 1, "results": [
             dict(game)
         ]})
@@ -67,10 +63,8 @@ class TestGameAPI:
     def test_read_with_offset(dao_mock: Mock, game: Game):
         dao_mock.get_all.return_value = 3, [game]
         res = game_api.read.__wrapped__(
-            offset=2, dao=dao_mock,token_info={
-                "iat": datetime.now().timestamp(),
-                "exp": (datetime.now() + timedelta(1.0)).timestamp()
-            })
+            offset=2, dao=dao_mock,
+            token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 3, "results": [
             dict(game)
         ]})
