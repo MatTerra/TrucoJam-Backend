@@ -58,7 +58,7 @@ jobs:
         if: ${{ steps.files-changed.outputs.result == 'true' }}
         run: |
           mkdir -p reports
-          pylint src --rcfile=standard.rc -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > reports/lint_report
+          pylint src --exit-zero --rcfile=standard.rc -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > reports/lint_report
 
       - name: Save pylint report
         if: ${{ steps.files-changed.outputs.result == 'true' }}
