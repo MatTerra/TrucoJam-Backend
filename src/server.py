@@ -1,23 +1,19 @@
 from os import environ
 
 import connexion
+import requests
 from flask_cors import CORS
-
-from nova_api import create_api_files
-
-print("imports")
+import nova_api
 
 debug = environ.get('DEBUG') or '0'
 if debug == '0':
-    debug = False
+    nova_api.DEBUG = False
 elif debug == '1':
-    debug = True
+    nova_api.DEBUG = True
 
 APIS = environ.get('APIS') or ''
 APIS = [api.strip() for api in APIS.split(',')]
 print("reading Apis: ", APIS)
-
-VERSION = environ.get('VERSION') or '1'
 
 # Create the application instance
 app = connexion.App(__name__, specification_dir=".")
@@ -29,6 +25,14 @@ for api in APIS:
         continue
     app.add_api(api)
     print("Done adding api {api}".format(api=api))
+
+
+r = requests.get(
+    "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+)
+if r.ok:
+    nova_api.auth.JWT_SECRET = r.json()
+
 print("Full setup")
 
 # If we're running in stand alone mode, run the application

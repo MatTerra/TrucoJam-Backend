@@ -1,5 +1,6 @@
 from dataclasses import fields
 
+from nova_api.auth import validate_jwt_claims
 from nova_api.dao.mongo_dao import MongoDAO
 from nova_api import error_response, success_response, use_dao
 
@@ -14,6 +15,7 @@ def probe(dao: MongoDAO = None):
                             data={"available": total})
 
 
+@validate_jwt_claims(claims={})
 @use_dao(GameDAO, "Unable to list game")
 def read(length: int = 20, offset: int = 0,
          dao: MongoDAO = None, **kwargs):
@@ -101,3 +103,8 @@ def delete(id_: str, dao: MongoDAO):
 
     return success_response(message="Game deleted",
                             data={"Game": dict(entity)})
+
+
+@use_dao(GameDAO, "Unable to start partida")
+def create_partida(id_: str, dao: MongoDAO):
+    pass

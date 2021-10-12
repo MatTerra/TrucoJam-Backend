@@ -37,6 +37,8 @@ paths:
   /:
     get:
       operationId: utils.controller.game_api.read
+      security:
+        - jwt: ['secret']
       tags:
         - "Game"
       parameters:
@@ -202,6 +204,49 @@ paths:
                 properties:
                   error:
                     type: string
+    post:
+      operationId: utils.controller.game_api.create_partida
+      tags:
+        - "Game"
+        - "Partida"
+      parameters:
+        - name: id_
+          in: path
+          type: string
+          required: true
+          description: "Game to add partida to"
+      summary: "Create a new Partida in a Game."
+      description: |
+        "Creates a new Partida in the Game"
+      responses:
+        201:
+          description: "Partida created"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
     put:
       operationId: utils.controller.game_api.update
       tags:
@@ -292,3 +337,11 @@ paths:
                 properties:
                   error:
                     type: string
+
+securityDefinitions:
+    jwt:
+        type: apiKey
+        name: Authorization
+        in: header
+        x-authentication-scheme: Bearer
+        x-bearerInfoFunc: nova_api.auth.decode_jwt_token

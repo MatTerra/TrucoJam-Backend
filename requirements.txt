@@ -1,4 +1,4 @@
-NovaAPI[mongo]==0.2.0
+NovaAPI[mongo]==0.2.1
 pytest
 pytest-mock
 pytest-cov
