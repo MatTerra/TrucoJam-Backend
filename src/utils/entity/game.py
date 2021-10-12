@@ -1,18 +1,35 @@
+"""
+Game model module
+"""
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import List
 
 from nova_api.entity import Entity
 
 
-def pontuacao_vazia():
+def pontuacao_vazia() -> List[int]:
+    """
+    Simple empty pontuacao generator
+
+    :return: Empty pontuacao list
+    """
     return [0, 0]
 
 
-def times_vazios():
+def times_vazios() -> List[List[str]]:
+    """
+    Simple empty times generator
+
+    :return: Empty times list
+    """
     return [[], []]
 
 
 class GameStatus(Enum):
+    """
+    Game status enumeration
+    """
     AguardandoJogadores = 0
     Jogando = 1
     Encerrado = 2
@@ -20,6 +37,9 @@ class GameStatus(Enum):
 
 @dataclass
 class Game(Entity):
+    """
+    Game model
+    """
     pontuacao: list = field(default_factory=pontuacao_vazia)
     senha: str = ""
     times: list = field(default_factory=times_vazios)

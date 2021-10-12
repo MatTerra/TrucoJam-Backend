@@ -1,3 +1,6 @@
+"""
+Server configuration for the backend of Truco JAM
+"""
 from os import environ
 
 import connexion
