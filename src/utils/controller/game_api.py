@@ -207,6 +207,3 @@ def join(id_: str, password: dict = None, token_info: dict = None,
     
     return success_response(message="Joined Game",
                             data={"Game": dict(game)})
-
-
-    
