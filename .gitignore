@@ -1,0 +1,7 @@
+__pycache__/
+xunit-reports/
+.idea/
+.coverage
+coverage-reports/
+
+Horas*

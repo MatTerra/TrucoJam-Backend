@@ -1,6 +1,8 @@
 """
 Truco JAM Game backend controller
 """
+from copy import deepcopy
+
 from nova_api.auth import validate_jwt_claims
 from nova_api.dao.mongo_dao import MongoDAO
 from nova_api import error_response, success_response, use_dao
@@ -166,3 +168,45 @@ def create_partida(id_: str, dao: MongoDAO):
     :return:
     """
     dao.get(id_=id_)
+
+@use_dao(GameDAO, "Unable to list game")
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
+def join(id_: str, password: dict = None, token_info: dict = None,
+         dao: MongoDAO=None):
+    """
+    Join a game. This checks the password informed and adds the user \
+        to the game if correct.
+
+    :param id_: ID of the game to join
+    :param password: Dict with the password to join the game
+    :param token_info: User token data
+    :return:
+    dao -> .get(id_) -> Retorna jogo com id_
+        -> get_all -> Retorna todos os jogos
+        -> update(game) -> Atualiza o jogo
+        -> create(game) -> Cria o jogo
+        -> remove(game) -> Delete o jogo
+    error_response(status_code, message, data)
+    """
+    game = dao.get(id_=id_)
+    user_id_ = token_info.get("sub")
+
+    if not game:
+        return error_response(404, "This game doesn't exist", {"id_": id_})
+
+    if user_id_ in game.jogadores:
+        return error_response(412, "User is already in game", {"Game": dict(game)})
+    
+    if game.senha and game.senha != password.get("senha"):
+        return error_response(403, "Passwords don't match", {})
+
+
+    game.jogadores.append(user_id_)
+
+    dao.update(deepcopy(game))
+    
+    return success_response(message="Joined Game",
+                            data={"Game": dict(game)})
+
+
+    

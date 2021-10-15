@@ -44,4 +44,5 @@ class Game(Entity):
     senha: str = ""
     times: list = field(default_factory=times_vazios)
     partidas: list = field(default_factory=list)
+    jogadores: list = field(default_factory=list)
     status: GameStatus = GameStatus.AguardandoJogadores

@@ -338,6 +338,63 @@ paths:
                   error:
                     type: string
 
+  /{id_}/join:
+    put:
+      operationId: utils.controller.game_api.join
+      security:
+        - jwt: ['secret']
+      tags:
+        - "Game"
+      parameters:
+        - name: id_
+          in: path
+          type: string
+          required: true
+          description: "Id of game to join"
+        - name: password
+          in: body
+          schema:
+            type: object
+            properties:
+              senha:
+                type: string
+          required: false
+          description: "Game password"
+      summary: "Join Game"
+      description: |
+        "Join an open game."
+      responses:
+        200:
+          description: "Game"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        401:
+          description: "Unauthorized due to invalid or not present token"
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+
 securityDefinitions:
     jwt:
         type: apiKey

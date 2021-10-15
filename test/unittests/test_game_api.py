@@ -6,13 +6,7 @@ from pytest import fixture, raises
 
 from utils.controller import game_api
 from utils.entity.game import Game
-
-TOKEN_INFO = {
-    "iat": datetime.now().timestamp(),
-    "exp": (datetime.now() + timedelta(1.0)).timestamp(),
-    "iss": "https://securetoken.google.com/trucojam",
-    "aud": "trucojam"
-}
+from test.unittests import dao_mock, success_response, TOKEN_INFO, game
 
 
 def raise_exception(exc_type: Type[Exception] = Exception):
@@ -94,23 +88,3 @@ class TestGameAPI:
 
         dao_mock.create.assert_called_with(entity=game)
         assert res == (201, "Game created", {"Game": dict(game)})
-
-    @staticmethod
-    @fixture
-    def dao_mock():
-        dao_mock = Mock()
-        dao_mock.get_all.return_value = 0, []
-        return dao_mock
-
-    @staticmethod
-    @fixture
-    def game():
-        return Game()
-
-    @staticmethod
-    @fixture(autouse=True)
-    def success_response(mocker):
-        mock = mocker.patch("utils.controller.game_api.success_response")
-        mock.side_effect = lambda status_code=200, message="OK", data={}: \
-            (status_code, message, data)
-        return mock
