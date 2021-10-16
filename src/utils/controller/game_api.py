@@ -66,8 +66,8 @@ def read(length: int = 20, offset: int = 0,
 
 
 @use_dao(GameDAO, "Unable to retrieve game")
-@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=False)
-def read_one(id_: str, dao: MongoDAO = None):
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
+def read_one(id_: str, dao: MongoDAO = None, token_info: dict = None):
     """
     Recovers a single game from the database
 
@@ -81,6 +81,9 @@ def read_one(id_: str, dao: MongoDAO = None):
         return success_response(status_code=404,
                                 message="Game not found in database",
                                 data={"id_": id_})
+
+    if token_info.get("sub") not in result.jogadores:
+        return error_response(403, "Player not in game", {"id_": id_})
 
     return success_response(message="Game retrieved",
                             data={"Game": dict(result)})

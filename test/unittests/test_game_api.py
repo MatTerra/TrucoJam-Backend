@@ -6,7 +6,7 @@ from pytest import fixture, raises
 
 from utils.controller import game_api
 from utils.entity.game import Game
-from test.unittests import dao_mock, success_response, TOKEN_INFO, game
+from test.unittests import *
 
 
 def raise_exception(exc_type: Type[Exception] = Exception):
@@ -67,12 +67,23 @@ class TestGameAPI:
     @staticmethod
     def test_read_one_found(dao_mock: Mock, game: Game):
         dao_mock.get.return_value = game
+        game.join(TOKEN_INFO["sub"], game.senha)
 
         res = game_api.read_one.__wrapped__(id_=game.id_, dao=dao_mock,
                                             token_info=TOKEN_INFO)
 
         dao_mock.get.assert_called_with(id_=game.id_)
         assert res == (200, "Game retrieved", {"Game": dict(game)})
+
+    @staticmethod
+    def test_read_one_found_player_not_in_game(dao_mock: Mock, game: Game):
+        dao_mock.get.return_value = game
+
+        res = game_api.read_one.__wrapped__(id_=game.id_, dao=dao_mock,
+                                            token_info=TOKEN_INFO)
+
+        dao_mock.get.assert_called_with(id_=game.id_)
+        assert res == (403, "Player not in game", {"id_": game.id_})
 
     @staticmethod
     def test_read_one_not_found(dao_mock: Mock, game: Game):
