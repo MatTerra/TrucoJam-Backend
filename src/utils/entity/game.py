@@ -71,3 +71,6 @@ class Game(Entity):
                                          f"for game {self.id_}.")
 
         self.jogadores.append(user_id_)
+
+        if len(self.jogadores) == 4:
+            self.status = GameStatus.Jogando

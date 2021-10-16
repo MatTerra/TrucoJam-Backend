@@ -73,3 +73,11 @@ class TestGame:
         with raises(FullGameException):
             game.join(user_id_)
 
+    @staticmethod
+    def test_join_last_player_should_change_status():
+        game = Game(jogadores=["a", "b", "c"])
+
+        game.join(user_id_)
+        assert game.status == GameStatus.Jogando
+
+
