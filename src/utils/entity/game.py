@@ -46,3 +46,6 @@ class Game(Entity):
     partidas: list = field(default_factory=list)
     jogadores: list = field(default_factory=list)
     status: GameStatus = GameStatus.AguardandoJogadores
+
+    def join(self, user_id_, senha: str = ""):
+        self.jogadores.append(user_id_)

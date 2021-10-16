@@ -68,7 +68,8 @@ class TestGameAPI:
     def test_read_one_found(dao_mock: Mock, game: Game):
         dao_mock.get.return_value = game
 
-        res = game_api.read_one.__wrapped__(id_=game.id_, dao=dao_mock)
+        res = game_api.read_one.__wrapped__(id_=game.id_, dao=dao_mock,
+                                            token_info=TOKEN_INFO)
 
         dao_mock.get.assert_called_with(id_=game.id_)
         assert res == (200, "Game retrieved", {"Game": dict(game)})
@@ -77,14 +78,15 @@ class TestGameAPI:
     def test_read_one_not_found(dao_mock: Mock, game: Game):
         dao_mock.get.return_value = None
 
-        res = game_api.read_one.__wrapped__(id_=game.id_, dao=dao_mock)
+        res = game_api.read_one.__wrapped__(id_=game.id_, dao=dao_mock,
+                                            token_info=TOKEN_INFO)
 
         dao_mock.get.assert_called_with(id_=game.id_)
         assert res == (404, "Game not found in database", {"id_": game.id_})
 
     @staticmethod
     def test_create(dao_mock: Mock, game: Game):
-        res = game_api.create.__wrapped__(entity=dict(game), dao=dao_mock)
+        res = game_api.create.__wrapped__(dict(game), dao_mock, token_info=TOKEN_INFO)
 
         dao_mock.create.assert_called_with(entity=game)
         assert res == (201, "Game created", {"Game": dict(game)})

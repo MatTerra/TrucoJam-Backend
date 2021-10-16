@@ -119,6 +119,8 @@ paths:
                     type: string
     post:
       operationId: utils.controller.game_api.create
+      security:
+        - jwt: [ 'secret' ]
       tags:
         - "Game"
       parameters:
@@ -164,6 +166,8 @@ paths:
   /{id_}:
     get:
       operationId: utils.controller.game_api.read_one
+      security:
+        - jwt: [ 'secret' ]
       tags:
         - "Game"
       parameters:
@@ -206,6 +210,8 @@ paths:
                     type: string
     post:
       operationId: utils.controller.game_api.create_partida
+      security:
+        - jwt: [ 'secret' ]
       tags:
         - "Game"
         - "Partida"
@@ -249,6 +255,8 @@ paths:
                     type: string
     put:
       operationId: utils.controller.game_api.update
+      security:
+        - jwt: [ 'secret' ]
       tags:
         - "Game"
       parameters:
@@ -297,6 +305,8 @@ paths:
                     type: string
     delete:
       operationId: utils.controller.game_api.delete
+      security:
+        - jwt: [ 'secret' ]
       tags:
         - "Game"
       parameters:
