@@ -2,6 +2,9 @@ from nova_api.dao import is_valid_uuidv4
 from pytest import raises, mark
 
 from utils.entity.game import Game, GameStatus
+from utils.exceptions.full_game_exception import FullGameException
+from utils.exceptions.not_waiting_for_players_exception import \
+    NotWaitingForPlayersException
 from utils.exceptions.user_already_in_game_exception import \
     UserAlreadyInGameException
 from utils.exceptions.wrong_password_exception import WrongPasswordException
@@ -50,5 +53,23 @@ class TestGame:
         game.join(user_id_)
 
         with raises(UserAlreadyInGameException):
+            game.join(user_id_)
+
+    @staticmethod
+    @mark.parametrize("status", [
+        GameStatus.Encerrado,
+        GameStatus.Jogando
+    ])
+    def test_join_game_encerrado_should_raise(status):
+        game = Game(status=status)
+
+        with raises(NotWaitingForPlayersException):
+            game.join(user_id_)
+
+    @staticmethod
+    def test_join_full_game_should_raise():
+        game = Game(jogadores=["a", "b", "c", "d"])
+
+        with raises(FullGameException):
             game.join(user_id_)
 

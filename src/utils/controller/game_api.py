@@ -186,13 +186,7 @@ def join(id_: str, password: dict = None, token_info: dict = None,
     :param id_: ID of the game to join
     :param password: Dict with the password to join the game
     :param token_info: User token data
-    :return:
-    dao -> .get(id_) -> Retorna jogo com id_
-        -> get_all -> Retorna todos os jogos
-        -> update(game) -> Atualiza o jogo
-        -> create(game) -> Cria o jogo
-        -> remove(game) -> Delete o jogo
-    error_response(status_code, message, data)
+    :return: Success if the join was successful and false otherwise.
     """
     game: Game = dao.get(id_=id_)
     user_id_ = token_info.get("sub")

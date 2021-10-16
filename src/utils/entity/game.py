@@ -7,6 +7,9 @@ from typing import List
 
 from nova_api.entity import Entity
 
+from utils.exceptions.full_game_exception import FullGameException
+from utils.exceptions.not_waiting_for_players_exception import \
+    NotWaitingForPlayersException
 from utils.exceptions.user_already_in_game_exception import \
     UserAlreadyInGameException
 from utils.exceptions.wrong_password_exception import WrongPasswordException
@@ -52,6 +55,13 @@ class Game(Entity):
     status: GameStatus = GameStatus.AguardandoJogadores
 
     def join(self, user_id_, senha: str = ""):
+        if len(self.jogadores) == 4:
+            raise FullGameException(f"Game {self.id_} is already full.")
+
+        if self.status != GameStatus.AguardandoJogadores:
+            raise NotWaitingForPlayersException(f"Game {self.id_} not "
+                                                f"waiting for players.")
+
         if user_id_ in self.jogadores:
             raise UserAlreadyInGameException(f"User {user_id_} "
                                              f"already in game.")
