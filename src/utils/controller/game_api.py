@@ -194,20 +194,14 @@ def join(id_: str, password: dict = None, token_info: dict = None,
         -> remove(game) -> Delete o jogo
     error_response(status_code, message, data)
     """
-    game = dao.get(id_=id_)
+    game: Game = dao.get(id_=id_)
     user_id_ = token_info.get("sub")
+    senha = password.get("senha")
 
     if not game:
         return error_response(404, "This game doesn't exist", {"id_": id_})
 
-    if user_id_ in game.jogadores:
-        return error_response(412, "User is already in game",
-                              {"Game": dict(game)})
-
-    if game.senha and game.senha != password.get("senha"):
-        return error_response(403, "Passwords don't match", {})
-
-    game.join(user_id_)
+    game.join(user_id_, senha)
 
     dao.update(deepcopy(game))
 

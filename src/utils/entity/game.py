@@ -7,6 +7,10 @@ from typing import List
 
 from nova_api.entity import Entity
 
+from utils.exceptions.user_already_in_game_exception import \
+    UserAlreadyInGameException
+from utils.exceptions.wrong_password_exception import WrongPasswordException
+
 
 def pontuacao_vazia() -> List[int]:
     """
@@ -48,4 +52,12 @@ class Game(Entity):
     status: GameStatus = GameStatus.AguardandoJogadores
 
     def join(self, user_id_, senha: str = ""):
+        if user_id_ in self.jogadores:
+            raise UserAlreadyInGameException(f"User {user_id_} "
+                                             f"already in game.")
+
+        if self.senha and senha != self.senha:
+            raise WrongPasswordException(f"Incorrect password: {senha} "
+                                         f"for game {self.id_}.")
+
         self.jogadores.append(user_id_)
