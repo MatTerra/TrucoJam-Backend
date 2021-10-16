@@ -97,6 +97,7 @@ def create(entity: dict, dao: MongoDAO = None, token_info: dict = None):
     :return:
     """
     entity_to_create = Game(**entity)
+    entity_to_create.join(token_info.get("sub"), entity_to_create.senha)
 
     dao.create(entity=entity_to_create)
 
