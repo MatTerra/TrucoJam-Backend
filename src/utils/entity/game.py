@@ -54,7 +54,21 @@ class Game(Entity):
     jogadores: list = field(default_factory=list)
     status: GameStatus = GameStatus.AguardandoJogadores
 
-    def join(self, user_id_, senha: str = ""):
+    def join(self, user_id_, senha: str = "") -> None:
+        """
+        Join game and updates the status if game full after join.
+
+        :raise FullGameException: If the game already has 4 players.
+        :raise NotWaitingForPlayersException: If the game is not in the \
+        waiting state.
+        :raise UserAlreadyInGameException: If user is already participating \
+        in this game.
+        :raise WrongPasswordException: If the senha informed doesn't match \
+        the game senha.
+
+        :param user_id_: User joining the game.
+        :param senha: Senha of the game.
+        """
         if len(self.jogadores) == 4:
             raise FullGameException(f"Game {self.id_} is already full.")
 

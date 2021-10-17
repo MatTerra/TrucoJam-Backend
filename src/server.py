@@ -32,9 +32,9 @@ for api in APIS:
     app.add_api(api)
     print("Done adding api {api}".format(api=api))
 
-
 r = requests.get(
-    "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+    "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system"
+    ".gserviceaccount.com"
 )
 if r.ok:
     certs = r.json()
@@ -48,6 +48,10 @@ if r.ok:
             format=PublicFormat.SubjectPublicKeyInfo
         )
     nova_api.auth.JWT_SECRET = certs
+
+nova_api.auth.JWT_SECRET['symmetric'] = environ.get(
+    "JWT_SYMM",
+    "secretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkey")
 
 print("Full setup")
 print("Keys are: ", nova_api.auth.JWT_SECRET)
