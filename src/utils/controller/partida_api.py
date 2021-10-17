@@ -18,7 +18,7 @@ def read(id_: str, token_info: dict = None, dao: GameDAO = None):
 
 @use_dao(GameDAO, "Unable to play card")
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=False)
-def play(id_: str, card: int, token_info: dict = None, dao: GameDAO = None):
+def play(id_: str, card: dict, token_info: dict = None, dao: GameDAO = None):
     pass
 
 @use_dao(GameDAO, "Unable to raise partida")
