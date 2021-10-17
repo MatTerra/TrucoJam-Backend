@@ -1,3 +1,9 @@
+import os
+script_dir = os.path.dirname(os.path.abspath(__file__))
+import sys
+from pathlib import Path
+sys.path.append(str(Path(os.path.join(script_dir, "../../src/")).resolve()))
+
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
