@@ -128,6 +128,15 @@ paths:
           in: body
           schema:
             type: object
+            properties:
+              n_players:
+                type: integer
+                minimum: 1
+                maximum: 4
+                description: "Number of human players in the game"
+              senha:
+                type: string
+                description: "Game password"
           required: true
           description: "Game to add"
       summary: "Create a new Game."
@@ -209,24 +218,23 @@ paths:
                   error:
                     type: string
     post:
-      operationId: utils.controller.game_api.create_partida
+      operationId: utils.controller.game_api.start_game
       security:
         - jwt: [ 'secret' ]
       tags:
         - "Game"
-        - "Partida"
       parameters:
         - name: id_
           in: path
           type: string
           required: true
-          description: "Game to add partida to"
-      summary: "Create a new Partida in a Game."
+          description: "Game to start"
+      summary: "Start a game."
       description: |
-        "Creates a new Partida in the Game"
+        "Starts a game by creating a new Partida in the Game"
       responses:
         201:
-          description: "Partida created"
+          description: "Game started"
           schema:
             type: object
             properties:
@@ -253,56 +261,7 @@ paths:
                 properties:
                   error:
                     type: string
-    put:
-      operationId: utils.controller.game_api.update
-      security:
-        - jwt: [ 'secret' ]
-      tags:
-        - "Game"
-      parameters:
-        - name: id_
-          in: path
-          type: string
-          required: true
-          description: "Id of game to select"
-        - name: entity
-          in: body
-          schema:
-            type: object
-          required: true
-          description: "Game to add"
-      summary: "Update Game"
-      description: |
-        "Update Game in database."
-      responses:
-        200:
-          description: "Game"
-          schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-              message:
-                type: string
-              data:
-                type: object
-                properties:
-                  entity:
-                    type: object
-        500:
-          description: "An error ocurred"
-          schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-              message:
-                type: string
-              data:
-                type: object
-                properties:
-                  error:
-                    type: string
+                    
     delete:
       operationId: utils.controller.game_api.delete
       security:
@@ -376,6 +335,254 @@ paths:
       responses:
         200:
           description: "Game"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        401:
+          description: "Unauthorized due to invalid or not present token"
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /{id_}/join-team/{team_id_}:
+    put:
+      operationId: utils.controller.game_api.join_team
+      security:
+        - jwt: ['secret']
+      tags:
+        - "Game"
+      parameters:
+        - name: id_
+          in: path
+          type: string
+          required: true
+          description: "Id of the game"
+        - name: team_id_
+          in: path
+          type: integer
+          required: true
+          enum: [0, 1]
+          description: "Team to join in game"
+      summary: "Join Team in Game"
+      description: |
+        "Join a team in a game."
+      responses:
+        200:
+          description: "Game"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        401:
+          description: "Unauthorized due to invalid or not present token"
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /{id_}/partida:
+    get:
+      operationId: utils.controller.partida_api.read
+      security:
+        - jwt: ['secret']
+      tags:
+        - "Partida"
+      parameters:
+        - name: id_
+          in: path
+          type: string
+          required: true
+          description: "Id of the game"
+      summary: "Get partida in progess"
+      description: |
+        "Returns the partida in progress of the game."
+      responses:
+        200:
+          description: "Partida"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        401:
+          description: "Unauthorized due to invalid or not present token"
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+    post:
+      operationId: utils.controller.partida_api.play
+      security:
+        - jwt: ['secret']
+      tags:
+        - "Partida"
+      parameters:
+        - name: id_
+          in: path
+          type: string
+          required: true
+          description: "Id of the game"
+        - name: card
+          in: body
+          type: integer
+          required: true
+          description: "Id of card to play"
+      summary: "Play card in rodada"
+      description: |
+        "Plays a card for the partida in progress."
+      responses:
+        200:
+          description: "Partida"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        401:
+          description: "Unauthorized due to invalid or not present token"
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /{id_}/partida/raise:
+    put:
+      operationId: utils.controller.partida_api.raise_
+      security:
+        - jwt: ['secret']
+      tags:
+        - "Partida"
+      parameters:
+        - name: id_
+          in: path
+          type: string
+          required: true
+          description: "Id of the game"
+      summary: "Raise partida"
+      description: |
+        "Raises the partida value in 3."
+      responses:
+        200:
+          description: "Partida"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        401:
+          description: "Unauthorized due to invalid or not present token"
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /{id_}/partida/fold:
+    put:
+      operationId: utils.controller.partida_api.fold
+      security:
+        - jwt: ['secret']
+      tags:
+        - "Partida"
+      parameters:
+        - name: id_
+          in: path
+          type: string
+          required: true
+          description: "Id of the game"
+      summary: "Fold partida"
+      description: |
+        "Folds the partida and gives the old points to the other team."
+      responses:
+        200:
+          description: "Partida"
           schema:
             type: object
             properties:
