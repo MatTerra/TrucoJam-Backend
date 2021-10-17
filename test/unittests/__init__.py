@@ -1,9 +1,15 @@
+import os
+import sys
+from pathlib import Path
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
 from pytest import fixture
 
 from utils.entity.game import Game
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(str(Path(os.path.join(script_dir, "..", "..", "src")).resolve()))
 
 TOKEN_INFO = {
     "iat": datetime.now().timestamp(),
