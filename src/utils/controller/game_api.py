@@ -1,6 +1,8 @@
 """
 Truco JAM Game backend controller
 """
+from copy import deepcopy
+
 from nova_api.auth import validate_jwt_claims
 from nova_api.dao.mongo_dao import MongoDAO
 from nova_api import error_response, success_response, use_dao
@@ -28,7 +30,7 @@ def probe(dao: MongoDAO = None):
 
 
 @use_dao(GameDAO, "Unable to list game")
-@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=False)
 def read(length: int = 20, offset: int = 0,
          # pylint: disable=W0613
          dao: MongoDAO = None, token_info: dict = None, **kwargs):
@@ -64,7 +66,8 @@ def read(length: int = 20, offset: int = 0,
 
 
 @use_dao(GameDAO, "Unable to retrieve game")
-def read_one(id_: str, dao: MongoDAO = None):
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
+def read_one(id_: str, dao: MongoDAO = None, token_info: dict = None):
     """
     Recovers a single game from the database
 
@@ -79,12 +82,16 @@ def read_one(id_: str, dao: MongoDAO = None):
                                 message="Game not found in database",
                                 data={"id_": id_})
 
+    if token_info.get("sub") not in result.jogadores:
+        return error_response(403, "Player not in game", {"id_": id_})
+
     return success_response(message="Game retrieved",
                             data={"Game": dict(result)})
 
 
 @use_dao(GameDAO, "Unable to create game")
-def create(entity: dict, dao: MongoDAO = None):
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
+def create(entity: dict, dao: MongoDAO = None, token_info: dict = None):
     """
     Creates a new game in the database
 
@@ -93,6 +100,7 @@ def create(entity: dict, dao: MongoDAO = None):
     :return:
     """
     entity_to_create = Game(**entity)
+    entity_to_create.join(token_info.get("sub"), entity_to_create.senha)
 
     dao.create(entity=entity_to_create)
 
@@ -102,6 +110,7 @@ def create(entity: dict, dao: MongoDAO = None):
 
 
 @use_dao(GameDAO, "Unable to update game")
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
 def update(id_: str, entity: dict, dao: MongoDAO = None):
     """
     Updates a Game in the database
@@ -135,6 +144,7 @@ def update(id_: str, entity: dict, dao: MongoDAO = None):
 
 
 @use_dao(GameDAO, "Unable to delete game")
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
 def delete(id_: str, dao: MongoDAO):
     """
     Endpoint to delete a game
@@ -166,3 +176,32 @@ def create_partida(id_: str, dao: MongoDAO):
     :return:
     """
     dao.get(id_=id_)
+
+
+@use_dao(GameDAO, "Unable to list game")
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
+def join(id_: str, password: dict = None, token_info: dict = None,
+         dao: GameDAO = None):
+    """
+    Join a game. This checks the password informed and adds the user \
+        to the game if correct.
+
+    :param dao: Database connection
+    :param id_: ID of the game to join
+    :param password: Dict with the password to join the game
+    :param token_info: User token data
+    :return: Success if the join was successful and false otherwise.
+    """
+    game: Game = dao.get(id_=id_)
+    user_id_ = token_info.get("sub")
+    senha = password.get("senha")
+
+    if not game:
+        return error_response(404, "This game doesn't exist", {"id_": id_})
+
+    game.join(user_id_, senha)
+
+    dao.update(deepcopy(game))
+
+    return success_response(message="Joined Game",
+                            data={"Game": dict(game)})
