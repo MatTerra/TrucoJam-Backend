@@ -9,11 +9,7 @@ from nova_api import error_response, success_response, use_dao
 
 from utils.database.game_dao import GameDAO
 from utils.entity.game import Game
-
-TRUCOJAM_BASE_CLAIMS = {
-    "iss": "https://securetoken.google.com/trucojam",
-    "aud": "trucojam"
-}
+from utils.controller import TRUCOJAM_BASE_CLAIMS
 
 
 @use_dao(GameDAO, "API Unavailable")
@@ -99,7 +95,8 @@ def create(entity: dict, dao: MongoDAO = None, token_info: dict = None):
     :param dao: The DAO to use to communicate with the database
     :return:
     """
-    entity_to_create = Game(**entity)
+    # TODO Treat n_players
+    entity_to_create = Game(**entity) # TODO change to only use senha
     entity_to_create.join(token_info.get("sub"), entity_to_create.senha)
 
     dao.create(entity=entity_to_create)
@@ -107,40 +104,6 @@ def create(entity: dict, dao: MongoDAO = None, token_info: dict = None):
     return success_response(status_code=201,
                             message="Game created",
                             data={"Game": dict(entity_to_create)})
-
-
-@use_dao(GameDAO, "Unable to update game")
-@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
-def update(id_: str, entity: dict, dao: MongoDAO = None):
-    """
-    Updates a Game in the database
-
-    :param id_: ID of the game to update
-    :param entity: Dictionary with the updated fields
-    :param dao: The DAO to use to communicate with the database
-    :return:
-    """
-    entity_to_update = dao.get(id_)
-
-    if not entity_to_update:
-        return error_response(status_code=404,
-                              message="Game not found",
-                              data={"id_": id_})
-
-    entity_fields = dao.fields.keys()
-
-    for key, value in entity.items():
-        if key not in entity_fields:
-            raise KeyError("{key} not in {entity}"
-                           .format(key=key,
-                                   entity=dao.return_class))
-
-        entity_to_update.__dict__[key] = value
-
-    dao.update(entity_to_update)
-
-    return success_response(message="Game updated",
-                            data={"Game": dict(entity_to_update)})
 
 
 @use_dao(GameDAO, "Unable to delete game")
@@ -167,7 +130,7 @@ def delete(id_: str, dao: MongoDAO):
 
 
 @use_dao(GameDAO, "Unable to start partida")
-def create_partida(id_: str, dao: MongoDAO):
+def start_game(id_: str, dao: MongoDAO):
     """
     Endpoint to create a new partida in a game
 
@@ -178,7 +141,7 @@ def create_partida(id_: str, dao: MongoDAO):
     dao.get(id_=id_)
 
 
-@use_dao(GameDAO, "Unable to list game")
+@use_dao(GameDAO, "Unable to join game")
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
 def join(id_: str, password: dict = None, token_info: dict = None,
          dao: GameDAO = None):
@@ -205,3 +168,9 @@ def join(id_: str, password: dict = None, token_info: dict = None,
 
     return success_response(message="Joined Game",
                             data={"Game": dict(game)})
+
+@use_dao(GameDAO, "Unable to join team in game")
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
+def join_team(id_: str, team_id_: str, token_info: dict = None,
+              dao: GameDAO = None):
+    pass

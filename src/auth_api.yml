@@ -1,0 +1,57 @@
+swagger: "2.0"
+info:
+  description: Anom API
+  version: "1.0.0"
+  title: Anonymous API
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+basePath: "/v1/anom"
+
+paths:
+  /token:
+    get:
+      operationId: utils.controller.auth_api.auth
+      tags:
+        - "Anom"
+        - "Auth"
+      parameters:
+        - name: name
+          in: query
+          type: string
+          required: true
+          description: "Anonymous player name"
+      summary: "Get anonymous token"
+      description: |
+        "Get an anonymous token to play games without authentication"
+      responses:
+        200:
+          description: "Token ok"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  token:
+                    type: string
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
