@@ -28,7 +28,7 @@ mao_id_ = {
     "jogador": id_,
     "cartas": [
         {
-            "naipe": Suit.ESPADAS.value,
+            "naipe": Suit.COPAS.value,
             "valor": Value.MANILHA.value,
             "rodada": None
         },
@@ -91,11 +91,12 @@ def game_with_players_and_hands(partida_with_hands):
     game.join(TOKEN_INFO["sub"])
     game.join("computer1")
     game.join("computer2")
+    game.times = [[0, 1], [2, 3]]
     game.partidas = [dict(partida_with_hands)]
     return game
 
 
-@fixture
+@fixture()
 def partida_with_hands():
     maos = [
         mao_id_,
@@ -144,12 +145,12 @@ def partida_with_hands():
             "cartas": [
                 {
                     "naipe": Suit.PAUS.value,
-                    "valor": Value.MANILHA.value,
+                    "valor": Value.THREE.value,
                     "rodada": None
                 },
                 {
                     "naipe": Suit.PAUS.value,
-                    "valor": Value.THREE.value,
+                    "valor": Value.MANILHA.value,
                     "rodada": None
                 },
                 {
