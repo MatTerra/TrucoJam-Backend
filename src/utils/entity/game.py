@@ -3,15 +3,17 @@ Game model module
 """
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
 from nova_api.entity import Entity
 
+from utils.entity.partida import Partida
 from utils.exceptions.full_game_exception import FullGameException
 from utils.exceptions.not_waiting_for_players_exception import \
     NotWaitingForPlayersException
 from utils.exceptions.user_already_in_game_exception import \
     UserAlreadyInGameException
+from utils.exceptions.user_not_in_game_exception import UserNotInGameException
 from utils.exceptions.wrong_password_exception import WrongPasswordException
 
 
@@ -54,7 +56,7 @@ class Game(Entity):
     jogadores: list = field(default_factory=list)
     status: GameStatus = GameStatus.AguardandoJogadores
 
-    def join(self, user_id_, senha: str = "") -> None:
+    def join(self, user_id_: str, senha: str = "") -> None:
         """
         Join game and updates the status if game full after join.
 
@@ -88,3 +90,46 @@ class Game(Entity):
 
         if len(self.jogadores) == 4:
             self.status = GameStatus.Jogando
+
+    def get_current_partida(self, user_id_: str) -> Optional[Partida]:
+        """
+        Returns the current partida correctly formatted for the player, that
+        is, excludes other players cards.
+
+        :raise UserNotInGameException: If user is not a player in this game.
+
+        :param user_id_: The player user_id_ to get the partida for.
+        :return: The partida viewed by the player.
+        """
+        if user_id_ not in self.jogadores:
+            raise UserNotInGameException(f"User {user_id_} not found in "
+                                         f"game {self.id_}")
+
+        if len(self.partidas) > 0:
+            partida = Partida(**self.partidas[-1])
+            Game.__filter_hands(partida, user_id_)
+            return partida
+
+        return None
+
+    @staticmethod
+    def __filter_hands(partida, user_id_):
+        partida.maos = [mao for mao in partida.maos
+                        if mao.get("jogador") == user_id_
+                        or Game.__hand_has_played_cards(mao)]
+        Game.__filter_played_cards(partida.maos, user_id_)
+
+    @staticmethod
+    def __filter_played_cards(maos, user_id_):
+        for mao in maos:
+            if mao.get("jogador") == user_id_:
+                continue
+            mao["cartas"] = [carta for carta in mao.get("cartas")
+                             if carta.get("rodada") is not None]
+
+    @staticmethod
+    def __hand_has_played_cards(mao):
+        for carta in mao.get("cartas"):
+            if carta.get("rodada") is not None:
+                return True
+        return False

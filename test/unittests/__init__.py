@@ -9,7 +9,8 @@ from pytest import fixture
 from utils.entity.game import Game
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(str(Path(os.path.join(script_dir, "..", "..", "src")).resolve()))
+sys.path.append(
+    str(Path(os.path.join(script_dir, "..", "..", "src")).resolve()))
 
 TOKEN_INFO = {
     "iat": datetime.now().timestamp(),
@@ -19,7 +20,7 @@ TOKEN_INFO = {
     "sub": "23f2f1750af74f4b8d38683e4ed1b80b"
 }
 
-id_="ee81aa59cf1b41ea979e51f5170a128b"
+id_ = "ee81aa59cf1b41ea979e51f5170a128b"
 
 
 @fixture
@@ -50,5 +51,5 @@ def game():
     return Game(id_=id_, senha="123")
 
 
-__all__=["dao_mock", "success_response", "error_response",
-         "TOKEN_INFO", "game", "id_"]
+__all__ = ["dao_mock", "success_response", "error_response",
+           "TOKEN_INFO", "game", "id_"]
