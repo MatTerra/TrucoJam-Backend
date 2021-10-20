@@ -6,7 +6,9 @@ from unittest.mock import Mock
 
 from pytest import fixture
 
+from utils.entity.card import Suit, Value
 from utils.entity.game import Game
+from utils.entity.partida import Partida
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(
@@ -21,6 +23,27 @@ TOKEN_INFO = {
 }
 
 id_ = "ee81aa59cf1b41ea979e51f5170a128b"
+
+mao_id_ = {
+    "jogador": id_,
+    "cartas": [
+        {
+            "naipe": Suit.ESPADAS.value,
+            "valor": Value.MANILHA.value,
+            "rodada": None
+        },
+        {
+            "naipe": Suit.OUROS.value,
+            "valor": Value.KING.value,
+            "rodada": None
+        },
+        {
+            "naipe": Suit.OUROS.value,
+            "valor": Value.JACK.value,
+            "rodada": None
+        }
+    ]
+}
 
 
 @fixture
@@ -51,5 +74,97 @@ def game():
     return Game(id_=id_, senha="123")
 
 
+@fixture
+def game_with_players():
+    game = Game()
+    game.join(id_)
+    game.join(TOKEN_INFO["sub"])
+    game.join("computer1")
+    game.join("computer2")
+    return game
+
+
+@fixture
+def game_with_players_and_hands(partida_with_hands):
+    game = Game()
+    game.join(id_)
+    game.join(TOKEN_INFO["sub"])
+    game.join("computer1")
+    game.join("computer2")
+    game.partidas = [dict(partida_with_hands)]
+    return game
+
+
+@fixture
+def partida_with_hands():
+    maos = [
+        mao_id_,
+        {
+            "jogador": TOKEN_INFO.get("sub"),
+            "cartas": [
+                {
+                    "naipe": Suit.COPAS.value,
+                    "valor": Value.ACE.value,
+                    "rodada": None
+                },
+                {
+                    "naipe": Suit.OUROS.value,
+                    "valor": Value.ACE.value,
+                    "rodada": None
+                },
+                {
+                    "naipe": Suit.ESPADAS.value,
+                    "valor": Value.MANILHA.value,
+                    "rodada": None
+                }
+            ]
+        },
+        {
+            "jogador": "computer1",
+            "cartas": [
+                {
+                    "naipe": Suit.ESPADAS.value,
+                    "valor": Value.MANILHA.value,
+                    "rodada": None
+                },
+                {
+                    "naipe": Suit.ESPADAS.value,
+                    "valor": Value.QUEEN.value,
+                    "rodada": None
+                },
+                {
+                    "naipe": Suit.PAUS.value,
+                    "valor": Value.QUEEN.value,
+                    "rodada": None
+                }
+            ]
+        },
+        {
+            "jogador": "computer2",
+            "cartas": [
+                {
+                    "naipe": Suit.PAUS.value,
+                    "valor": Value.MANILHA.value,
+                    "rodada": None
+                },
+                {
+                    "naipe": Suit.PAUS.value,
+                    "valor": Value.THREE.value,
+                    "rodada": None
+                },
+                {
+                    "naipe": Suit.OUROS.value,
+                    "valor": Value.THREE.value,
+                    "rodada": None
+                }
+            ]
+        }
+    ]
+
+    return Partida(maos=maos)
+
+
 __all__ = ["dao_mock", "success_response", "error_response",
-           "TOKEN_INFO", "game", "id_"]
+           "TOKEN_INFO", "game", "id_", "game_with_players",
+           "game_with_players_and_hands", "mao_id_",
+           "partida_with_hands"]

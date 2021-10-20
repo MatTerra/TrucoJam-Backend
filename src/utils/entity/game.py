@@ -9,6 +9,7 @@ from nova_api.entity import Entity
 
 from utils.entity.partida import Partida
 from utils.exceptions.full_game_exception import FullGameException
+from utils.exceptions.game_over_exception import GameOverException
 from utils.exceptions.not_waiting_for_players_exception import \
     NotWaitingForPlayersException
 from utils.exceptions.user_already_in_game_exception import \
@@ -97,13 +98,17 @@ class Game(Entity):
         is, excludes other players cards.
 
         :raise UserNotInGameException: If user is not a player in this game.
+        :raise GameOverException: If game status is Encerrado
 
         :param user_id_: The player user_id_ to get the partida for.
         :return: The partida viewed by the player.
         """
         if user_id_ not in self.jogadores:
             raise UserNotInGameException(f"User {user_id_} not found in "
-                                         f"game {self.id_}")
+                                         f"game {self.id_}.")
+
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException(f"Game {self.id_} is already over.")
 
         if len(self.partidas) > 0:
             partida = Partida(**self.partidas[-1])
