@@ -12,7 +12,7 @@ from utils.controller import TRUCOJAM_BASE_CLAIMS
 
 
 @use_dao(GameDAO, "Unable to list partida")
-@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=False)
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
 def read(id_: str, token_info: dict = None, dao: GameDAO = None):
     """
     Retrieve partida in progress. This only returns if player is \
@@ -23,7 +23,19 @@ def read(id_: str, token_info: dict = None, dao: GameDAO = None):
     :param dao: The database connection to use.
     :return: The current partida if successful and player in game.
     """
-    pass
+    game = dao.get(id_=id_)
+    user_id_ = token_info.get("sub")
+
+    if not game:
+        return error_response(404, "This game doesn't exist", {"id_": id_})
+
+    current_partida = game.get_current_partida(user_id_)
+
+    if not current_partida:
+        return success_response(204, "No current partida", {})
+
+    return success_response(200, "Current partida retrieved",
+                            {"partida": dict(current_partida)})
 
 
 @use_dao(GameDAO, "Unable to play card")
