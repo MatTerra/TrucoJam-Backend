@@ -36,11 +36,11 @@ class Partida:
         if self.__is_user_card_played(user_index, card_id_):
             raise CardAlreadyPlayedException("User tried to replay a card")
 
-        round = self.__get_current_round()
+        current_round = self.__get_current_round()
 
-        self.maos[user_index]["cartas"][card_id_]["rodada"] = round
+        self.maos[user_index]["cartas"][card_id_]["rodada"] = current_round
 
-        self.turno = self.__get_next_turn(round)
+        self.turno = self.__get_next_turn(current_round)
 
     def __is_user_card_played(self, user_index, card_id_):
         return self.__get_user_card_round(user_index, card_id_) is not None
