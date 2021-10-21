@@ -39,7 +39,7 @@ def read(id_: str, token_info: dict = None, dao: GameDAO = None):
 
 
 @use_dao(GameDAO, "Unable to play card")
-@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=False)
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
 def play(id_: str, card: dict, token_info: dict = None, dao: GameDAO = None):
     """
     Play a card from the player hand in the current partida. Only the card \
@@ -51,7 +51,19 @@ def play(id_: str, card: dict, token_info: dict = None, dao: GameDAO = None):
     :param dao: The database connection to use.
     :return: The partida after the card being played. (May include AI plays)
     """
-    pass
+    game: Game = dao.get(id_=id_)
+    user_id_ = token_info.get("sub")
+    card_id_ = card.get("id_")
+
+    if not game:
+        return error_response(404, "This game doesn't exist", {"id_": id_})
+
+    if not game.get_current_partida(user_id_):
+        return error_response(400, "No current partida", {})
+
+    partida = game.play(user_id_, card_id_)
+
+    return success_response(200, "Card played", {"partida": dict(partida)})
 
 
 @use_dao(GameDAO, "Unable to raise partida")

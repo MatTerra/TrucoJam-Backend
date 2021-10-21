@@ -4,6 +4,7 @@ from typing import List
 from utils.entity.card import Card, Suit, Value
 from utils.exceptions.card_already_played_exception import \
     CardAlreadyPlayedException
+from utils.exceptions.invalid_card_exception import InvalidCardException
 from utils.exceptions.not_user_turn_exception import NotUserTurnException
 from utils.exceptions.partida_over_exception import PartidaOverException
 
@@ -21,12 +22,16 @@ class Partida:
             yield key, value
 
     def play(self, user_index: int, card_id_: int):
-        if user_index != self.turno:
-            raise NotUserTurnException("User tried to play out of turn")
-
         if self.vencedor is not None:
             raise PartidaOverException("User tried to play card on ended "
                                        "partida.")
+
+        if user_index != self.turno:
+            raise NotUserTurnException("User tried to play out of turn")
+
+        if card_id_ not in [0, 1, 2]:
+            raise InvalidCardException(f"User tried to play invalid card "
+                                       f"{card_id_}")
 
         if self.__is_user_card_played(user_index, card_id_):
             raise CardAlreadyPlayedException("User tried to replay a card")

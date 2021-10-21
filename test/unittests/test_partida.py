@@ -1,8 +1,9 @@
-from pytest import raises
+from pytest import raises, mark
 
 from test.unittests import *
 from utils.exceptions.card_already_played_exception import \
     CardAlreadyPlayedException
+from utils.exceptions.invalid_card_exception import InvalidCardException
 from utils.exceptions.not_user_turn_exception import NotUserTurnException
 from utils.exceptions.partida_over_exception import PartidaOverException
 
@@ -20,6 +21,14 @@ class TestPartida:
             partida_with_hands.play(0, 0)
 
         partida_with_hands.maos[0]["cartas"][0]["rodada"] = None
+
+    @staticmethod
+    @mark.parametrize("card", [
+        -1, 3, 5
+    ])
+    def test_play_invalid_card_should_raise(partida_with_hands, card):
+        with raises(InvalidCardException):
+            partida_with_hands.play(0, card)
 
     @staticmethod
     def test_play_card_should_play(partida_with_hands):
