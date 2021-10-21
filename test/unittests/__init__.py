@@ -10,7 +10,7 @@ from utils.entity.game import Game
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(str(Path(os.path.join(script_dir, "..", "..", "src")).resolve()))
-
+print('aaaaa', sys.path)
 TOKEN_INFO = {
     "iat": datetime.now().timestamp(),
     "exp": (datetime.now() + timedelta(1.0)).timestamp(),
@@ -20,6 +20,7 @@ TOKEN_INFO = {
 }
 
 id_="ee81aa59cf1b41ea979e51f5170a128b"
+team_id_="0"
 
 
 @fixture
@@ -51,4 +52,4 @@ def game():
 
 
 __all__=["dao_mock", "success_response", "error_response",
-         "TOKEN_INFO", "game", "id_"]
+         "TOKEN_INFO", "game", "id_", "team_id_"]

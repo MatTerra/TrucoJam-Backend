@@ -2,6 +2,7 @@
 Truco JAM Game backend controller
 """
 from copy import deepcopy
+from os import times
 
 from nova_api.auth import validate_jwt_claims
 from nova_api.dao.mongo_dao import MongoDAO
@@ -11,6 +12,16 @@ from utils.database.game_dao import GameDAO
 from utils.entity.game import Game
 from utils.controller import TRUCOJAM_BASE_CLAIMS
 
+def check_team(user_id_, time_:list[str]):
+
+    return user_id_ in time_
+
+def user_team(user_id_, times):
+    
+    for team in times:
+        if check_team(user_id_,team):
+            return times.index(team)
+    return -1   
 
 @use_dao(GameDAO, "API Unavailable")
 def probe(dao: MongoDAO = None):
@@ -173,4 +184,31 @@ def join(id_: str, password: dict = None, token_info: dict = None,
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
 def join_team(id_: str, team_id_: str, token_info: dict = None,
               dao: GameDAO = None):
-    pass
+    
+    game: Game = dao.get(id_=id_)
+    user_id_ = token_info.get("sub")
+    
+
+    if team_id_ in range (0,1):
+        return error_response(412, "team flag is out of permitted range", {"team_id_": team_id_})
+    
+    if len(game.times[team_id_]) is 2:
+        return error_response(406,"team is already full")
+
+    team = user_team(user_id_, game.times)
+
+    if team == team_id_:
+        return success_response(304,"user already in team")
+
+    if team is 0 or team is 1:
+        game.times[team].remove(user_id_)
+
+
+
+    
+
+
+
+
+
+
