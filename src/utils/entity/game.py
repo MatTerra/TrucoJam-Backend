@@ -169,7 +169,7 @@ class Game(Entity):
             raise NotWaitingForPlayersException(f"Game {self.id_} not "
                                                 f"waiting for players.")
 
-        if user_id_ in self.jogadores:
+        if self.is_user_a_participant(user_id_):
             raise UserAlreadyInGameException(f"User {user_id_} "
                                              f"already in game.")
 
