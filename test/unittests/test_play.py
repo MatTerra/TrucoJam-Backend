@@ -69,14 +69,16 @@ class TestPlay():
         TestPlay.reset_partida(game_with_players_and_hands)
         game_with_players_and_hands.partidas[-1]["valor"] = 3
 
+        # round 1
         game_with_players_and_hands.play(id_, 0)
         game_with_players_and_hands.play(TOKEN_INFO.get("sub"), 0)
         game_with_players_and_hands.play("computer1", 1)
         game_with_players_and_hands.play("computer2", 1)
 
+        # round 2
         game_with_players_and_hands.play("computer2", 2)
         game_with_players_and_hands.play(id_, 1)
-        game_with_players_and_hands.play(TOKEN_INFO.get("sub"), 1)
+        game_with_players_and_hands.play(TOKEN_INFO.get("sub"), 2) # winner
         game_with_players_and_hands.play("computer1", 0)
 
         assert game_with_players_and_hands.pontuacao == [0, 3]

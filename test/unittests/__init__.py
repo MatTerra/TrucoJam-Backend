@@ -88,13 +88,12 @@ def game_with_players():
 def game_with_players_and_hands(partida_with_hands):
     game = Game()
     game.join(id_)
-    game.join(TOKEN_INFO["sub"])
-    game.join("computer1")
     game.join("computer2")
-    game.times = [[0, 1], [2, 3]]
+    game.join("computer1")
+    game.join(TOKEN_INFO["sub"])
+    game.times = [[id_, "computer1"], [TOKEN_INFO.get("sub"), "computer2"]]
     game.partidas = [dict(partida_with_hands)]
     return game
-
 
 @fixture()
 def partida_with_hands():

@@ -89,7 +89,7 @@ class Game(Entity):
 
         partida = self.__get_last_partida()
 
-        user_index = self.jogadores.index(user_id_)
+        user_index = self.__get_user_index(user_id_)
         partida.play(user_index, card_id_)
 
         self.__check_partida_winner(partida)
@@ -117,6 +117,9 @@ class Game(Entity):
         """
         return Partida(**self.partidas[-1])
 
+    def __get_user_index(self, user_id_):
+        return sum(zip(*self.times), ()).index(user_id_)
+
     def __check_partida_winner(self, partida: Partida) -> None:
         """
         Checks if the partida has been won by any team. If it has, registers it
@@ -124,7 +127,7 @@ class Game(Entity):
         :param partida: Partida to check
         :return:
         """
-        winners = [partida.get_round_winner(round_)
+        winners = [self.jogadores[partida.get_round_winner(round_)]
                    for round_ in range(ROUNDS_IN_PARTIDA)
                    if partida.get_round_winner(round_)]
 
@@ -137,14 +140,14 @@ class Game(Entity):
         if partida.vencedor is not None:
             self.pontuacao[partida.vencedor] += partida.valor
 
-    def __get_user_team(self, user: int) -> int:
+    def __get_user_team(self, user_id_: str) -> int:
         """
         Checks the team to verify in which team the player is.
-        :param user: The index of the player in the jogadores list
+        :param user_id_: The ID of the player to check
         :return: The team the player is in
         """
         for i in range(2):
-            if user in self.times[i]:
+            if user_id_ in self.times[i]:
                 return i
 
     def join(self, user_id_: str, senha: str = "") -> None:
