@@ -1,6 +1,7 @@
 """
 Game model module
 """
+from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional
@@ -17,6 +18,10 @@ from utils.exceptions.user_already_in_game_exception import \
     UserAlreadyInGameException
 from utils.exceptions.user_not_in_game_exception import UserNotInGameException
 from utils.exceptions.wrong_password_exception import WrongPasswordException
+
+ROUNDS_TO_WIN_PARTIDA = 2
+TIMES = 2
+ROUNDS_IN_PARTIDA = 3
 
 
 def pontuacao_vazia() -> List[int]:
@@ -58,6 +63,94 @@ class Game(Entity):
     jogadores: list = field(default_factory=list)
     status: GameStatus = GameStatus.AguardandoJogadores
 
+    def play(self, user_id_: str, card_id_: int) -> Optional[Partida]:
+        """
+        Plays the card with card_id_ for the user if it is its turn.
+
+        :raise UserNotInGameException: If user is not in game
+        :raise GameOverException: If game status is Encerrado
+        :raise NotUserTurnException: If it isn't the user's turn
+        :raise PartidaOverException: If the current partida is already won
+        :raise CardAlreadyPlayedException: If card_id_ has been played before
+
+
+        :param user_id_: The ID of the user that is playing
+        :param card_id_: The ID of the card to play
+        :return: The updated partida
+        """
+        if not self.is_user_a_participant(user_id_):
+            raise UserNotInGameException(f"User {user_id_} not found in "
+                                         f"game {self.id_}.")
+
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException(f"Game {self.id_} is already over.")
+
+        if len(self.partidas) == 0:
+            return None
+
+        partida = self.__get_last_partida()
+
+        user_index = self.__get_user_index(user_id_)
+        partida.play(user_index, card_id_)
+
+        self.__check_partida_winner(partida)
+
+        self.partidas[-1] = dict(partida)
+
+        partida_to_return = deepcopy(partida)
+        Game.__filter_hands(partida_to_return, user_id_)
+
+        return partida_to_return
+
+    def is_user_a_participant(self, user_id_: str) -> bool:
+        """
+        Checks that the user is part of the game
+
+        :param user_id_: The ID of the user to check
+        :return: True if user is in game, False otherwise
+        """
+        return user_id_ in self.jogadores
+
+    def __get_last_partida(self) -> Partida:
+        """
+        Returns the last partida in the partidas list as a Partida object
+        :return: The partida
+        """
+        return Partida(**self.partidas[-1])
+
+    def __get_user_index(self, user_id_):
+        return sum(zip(*self.times), ()).index(user_id_)
+
+    def __check_partida_winner(self, partida: Partida) -> None:
+        """
+        Checks if the partida has been won by any team. If it has, registers it
+        and sums the points
+        :param partida: Partida to check
+        :return:
+        """
+        winners = [self.jogadores[partida.get_round_winner(round_)]
+                   for round_ in range(ROUNDS_IN_PARTIDA)
+                   if partida.get_round_winner(round_)]
+
+        win_team = [self.__get_user_team(user) for user in winners]
+
+        for team in range(TIMES):
+            if win_team.count(team) == ROUNDS_TO_WIN_PARTIDA:
+                partida.vencedor = team
+
+        if partida.vencedor is not None:
+            self.pontuacao[partida.vencedor] += partida.valor
+
+    def __get_user_team(self, user_id_: str) -> int:
+        """
+        Checks the team to verify in which team the player is.
+        :param user_id_: The ID of the player to check
+        :return: The team the player is in
+        """
+        for i in range(2):
+            if user_id_ in self.times[i]:
+                return i
+
     def join(self, user_id_: str, senha: str = "") -> None:
         """
         Join game and updates the status if game full after join.
@@ -80,7 +173,7 @@ class Game(Entity):
             raise NotWaitingForPlayersException(f"Game {self.id_} not "
                                                 f"waiting for players.")
 
-        if user_id_ in self.jogadores:
+        if self.is_user_a_participant(user_id_):
             raise UserAlreadyInGameException(f"User {user_id_} "
                                              f"already in game.")
 
@@ -112,19 +205,19 @@ class Game(Entity):
         :param user_id_: The player user_id_ to get the partida for.
         :return: The partida viewed by the player.
         """
-        if user_id_ not in self.jogadores:
+        if not self.is_user_a_participant(user_id_):
             raise UserNotInGameException(f"User {user_id_} not found in "
                                          f"game {self.id_}.")
 
         if self.status == GameStatus.Encerrado:
             raise GameOverException(f"Game {self.id_} is already over.")
 
-        if len(self.partidas) > 0:
-            partida = Partida(**self.partidas[-1])
-            Game.__filter_hands(partida, user_id_)
-            return partida
+        if len(self.partidas) == 0:
+            return None
 
-        return None
+        partida = self.__get_last_partida()
+        Game.__filter_hands(partida, user_id_)
+        return partida
 
     @staticmethod
     def __filter_hands(partida, user_id_):
