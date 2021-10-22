@@ -111,6 +111,7 @@ def create(entity: dict, dao: MongoDAO = None, token_info: dict = None):
     entity_to_create.join(token_info.get("sub"), entity_to_create.senha)
 
     dao.create(entity=entity_to_create)
+    join_team(token_info.get("sub"),0)
 
     return success_response(status_code=201,
                             message="Game created",
@@ -187,11 +188,7 @@ def join_team(id_: str, team_id_: str, token_info: dict = None,
     
     game: Game = dao.get(id_=id_)
     user_id_ = token_info.get("sub")
-    
-
-    if team_id_ in range (0,1):
-        return error_response(412, "team flag is out of permitted range", {"team_id_": team_id_})
-    
+       
     if len(game.times[team_id_]) is 2:
         return error_response(406,"team is already full")
 
@@ -202,6 +199,8 @@ def join_team(id_: str, team_id_: str, token_info: dict = None,
 
     if team is 0 or team is 1:
         game.times[team].remove(user_id_)
+
+    
 
 
 

@@ -8,6 +8,7 @@ from typing import List
 from nova_api.entity import Entity
 
 from utils.exceptions.full_game_exception import FullGameException
+from utils.exceptions.invalid_team_exception import InvalidTeamException
 from utils.exceptions.not_waiting_for_players_exception import \
     NotWaitingForPlayersException
 from utils.exceptions.user_already_in_game_exception import \
@@ -88,3 +89,11 @@ class Game(Entity):
 
         if len(self.jogadores) == 4:
             self.status = GameStatus.Jogando
+    
+    def join_team(self, user_id_,team_id_):
+        if team_id_ not in range (0,1):
+            raise InvalidTeamException(f"team index {team_id_} "
+                                       f"out of range")
+        
+        self.times[team_id_].append(user_id_)
+        
