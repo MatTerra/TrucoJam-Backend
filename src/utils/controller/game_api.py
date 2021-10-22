@@ -12,16 +12,17 @@ from utils.database.game_dao import GameDAO
 from utils.entity.game import Game
 from utils.controller import TRUCOJAM_BASE_CLAIMS
 
-def check_team(user_id_, time_:list[str]):
 
+def check_team(user_id_, time_: list):
     return user_id_ in time_
 
+
 def user_team(user_id_, times):
-    
     for team in times:
-        if check_team(user_id_,team):
+        if check_team(user_id_, team):
             return times.index(team)
-    return -1   
+    return -1
+
 
 @use_dao(GameDAO, "API Unavailable")
 def probe(dao: MongoDAO = None):
@@ -106,16 +107,19 @@ def create(entity: dict, dao: MongoDAO = None, token_info: dict = None):
     :param dao: The DAO to use to communicate with the database
     :return:
     """
-    # TODO Treat n_players
-    entity_to_create = Game(**entity) # TODO change to only use senha
-    entity_to_create.join(token_info.get("sub"), entity_to_create.senha)
+    game = Game(senha=entity.get("senha", ""))
+    game.join(token_info.get("sub"), game.senha)
+    game.join_team(token_info.get("sub"), 0)
+    computers = 4 - entity.get("n_players", 4)
+    if computers:
+        for i in range(1, computers + 1):
+            game.join(f"computer{i + 1}", game.senha)
 
-    dao.create(entity=entity_to_create)
-    join_team(token_info.get("sub"),0)
+    dao.create(entity=game)
 
     return success_response(status_code=201,
                             message="Game created",
-                            data={"Game": dict(entity_to_create)})
+                            data={"Game": game.game_to_return()})
 
 
 @use_dao(GameDAO, "Unable to delete game")
@@ -142,15 +146,27 @@ def delete(id_: str, dao: MongoDAO):
 
 
 @use_dao(GameDAO, "Unable to start partida")
-def start_game(id_: str, dao: MongoDAO):
+@validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
+def start_game(id_: str, dao: MongoDAO, token_info: dict):
     """
     Endpoint to create a new partida in a game
 
+    :param token_info:
     :param id_: ID of the game in which to create the partida
     :param dao: The DAO to use to communicate with the database
     :return:
     """
-    dao.get(id_=id_)
+    game: Game = dao.get(id_=id_)
+    user_id_ = token_info.get("sub")
+
+    if not game:
+        return error_response(404, "This game doesn't exist", {"id_": id_})
+
+    game.create_partida(user_id_)
+    dao.update(game)
+    return success_response(201, "Game started", {
+        "Game": game.game_to_return()
+    })
 
 
 @use_dao(GameDAO, "Unable to join game")
@@ -179,35 +195,20 @@ def join(id_: str, password: dict = None, token_info: dict = None,
     dao.update(deepcopy(game))
 
     return success_response(message="Joined Game",
-                            data={"Game": dict(game)})
+                            data={"Game": game.game_to_return()})
+
 
 @use_dao(GameDAO, "Unable to join team in game")
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
 def join_team(id_: str, team_id_: str, token_info: dict = None,
               dao: GameDAO = None):
-    
     game: Game = dao.get(id_=id_)
     user_id_ = token_info.get("sub")
-       
-    if len(game.times[team_id_]) is 2:
-        return error_response(406,"team is already full")
 
-    team = user_team(user_id_, game.times)
+    if not game:
+        return error_response(404, "This game doesn't exist", {"id_": id_})
 
-    if team == team_id_:
-        return success_response(304,"user already in team")
+    game.join_team(user_id_, team_id_)
 
-    if team is 0 or team is 1:
-        game.times[team].remove(user_id_)
-
-    
-
-
-
-    
-
-
-
-
-
-
+    return success_response(200, "User joined team",
+                            {"Game": game.game_to_return()})

@@ -63,6 +63,8 @@ def play(id_: str, card: dict, token_info: dict = None, dao: GameDAO = None):
 
     partida = game.play(user_id_, card_id_)
 
+    dao.update(game)
+
     return success_response(200, "Card played", {"partida": dict(partida)})
 
 

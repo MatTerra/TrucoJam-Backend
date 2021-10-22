@@ -8,14 +8,22 @@ from typing import List, Optional
 
 from nova_api.entity import Entity
 
+from utils.entity.deck import Deck
 from utils.entity.partida import Partida
 from utils.exceptions.full_game_exception import FullGameException
+from utils.exceptions.full_team_exception import FullTeamException
+from utils.exceptions.game_already_started_exception import \
+    GameAlreadyStartedException
+from utils.exceptions.game_not_ready_exception import GameNotReadyException
 from utils.exceptions.invalid_team_exception import InvalidTeamException
 from utils.exceptions.game_over_exception import GameOverException
 from utils.exceptions.not_waiting_for_players_exception import \
     NotWaitingForPlayersException
+from utils.exceptions.partida_ongoing_exception import PartidaOngoingException
 from utils.exceptions.user_already_in_game_exception import \
     UserAlreadyInGameException
+from utils.exceptions.user_already_in_team_exception import \
+    UserAlreadyInTeamException
 from utils.exceptions.user_not_in_game_exception import UserNotInGameException
 from utils.exceptions.wrong_password_exception import WrongPasswordException
 
@@ -93,9 +101,18 @@ class Game(Entity):
         user_index = self.__get_user_index(user_id_)
         partida.play(user_index, card_id_)
 
-        self.__check_partida_winner(partida)
+        vencedor = self.__check_partida_winner(partida)
 
         self.partidas[-1] = dict(partida)
+
+        if vencedor \
+                and self.pontuacao[0] < 12 \
+                and self.pontuacao[1] < 12:
+            self.__create_partida()
+
+        if self.pontuacao[0] >= 12 \
+                or self.pontuacao[1] >= 12:
+            self.status = GameStatus.Encerrado
 
         partida_to_return = deepcopy(partida)
         Game.__filter_hands(partida_to_return, user_id_)
@@ -111,17 +128,19 @@ class Game(Entity):
         """
         return user_id_ in self.jogadores
 
-    def __get_last_partida(self) -> Partida:
+    def __get_last_partida(self) -> Optional[Partida]:
         """
         Returns the last partida in the partidas list as a Partida object
         :return: The partida
         """
-        return Partida(**self.partidas[-1])
+        if len(self.partidas) > 0:
+            return Partida(**self.partidas[-1])
+        return None
 
     def __get_user_index(self, user_id_):
         return sum(zip(*self.times), ()).index(user_id_)
 
-    def __check_partida_winner(self, partida: Partida) -> None:
+    def __check_partida_winner(self, partida: Partida) -> Optional[int]:
         """
         Checks if the partida has been won by any team. If it has, registers it
         and sums the points
@@ -141,7 +160,9 @@ class Game(Entity):
         if partida.vencedor is not None:
             self.pontuacao[partida.vencedor] += partida.valor
 
-    def __get_user_team(self, user_id_: str) -> int:
+        return partida.vencedor
+
+    def __get_user_team(self, user_id_: str) -> Optional[int]:
         """
         Checks the team to verify in which team the player is.
         :param user_id_: The ID of the player to check
@@ -150,6 +171,8 @@ class Game(Entity):
         for i in range(2):
             if user_id_ in self.times[i]:
                 return i
+
+        return None
 
     def join(self, user_id_: str, senha: str = "") -> None:
         """
@@ -185,14 +208,70 @@ class Game(Entity):
 
         if len(self.jogadores) == 4:
             self.status = GameStatus.Jogando
-    
-    def join_team(self, user_id_,team_id_):
-        if team_id_ not in range (0,1):
-            raise InvalidTeamException(f"team index {team_id_} "
-                                       f"out of range")
-        
+
+    def join_team(self, user_id_, team_id_):
+        team = self.__get_user_team(user_id_)
+
+        if self.__get_last_partida():
+            raise GameAlreadyStartedException(f"User {user_id_} tried to "
+                                              f"change team after game start.")
+
+        if team == team_id_:
+            raise UserAlreadyInTeamException(f"User {user_id_} tried to join "
+                                             f"the {team_id_} team twice")
+
+        if team_id_ not in range(0, 1):
+            raise InvalidTeamException(f"Team index {team_id_} "
+                                       f"out of range.")
+
+        if len(self.times[team_id_]) == 2:
+            raise FullTeamException(f"Team {team_id_} is already full")
+
+        if team:
+            self.times[team].remove(user_id_)
+
         self.times[team_id_].append(user_id_)
-        
+
+    def create_partida(self, user_id_):
+        if not self.is_user_a_participant(user_id_):
+            raise UserNotInGameException(f"User {user_id_} not found in "
+                                         f"game {self.id_}.")
+
+        if self.__get_last_partida():
+            raise PartidaOngoingException("Tried to create a partida in a "
+                                          "game with a partida in progress")
+
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException("Tried to create a partida in an ended "
+                                    "game")
+
+        if self.status == GameStatus.AguardandoJogadores \
+                or len(self.times[0]) < 2 \
+                or len(self.times[1]) < 2:
+            raise GameNotReadyException("Game is not ready to start")
+
+        self.__create_partida()
+
+    def __create_partida(self):
+        self.partidas.append(dict(
+            Partida(maos=self.__generate_player_hands())
+        ))
+
+    def __generate_player_hands(self):
+        deck = Deck()
+        deck.shuffle()
+        maos = [
+            {
+                "jogador": jogador,
+                "cartas": [
+                    {"naipe": carta.naipe.value,
+                     "valor": carta.valor.value,
+                     "rodada": None}
+                    for carta in [deck.buy_card(),
+                                  deck.buy_card(),
+                                  deck.buy_card()]]}
+            for jogador in self.jogadores]
+        return maos
 
     def get_current_partida(self, user_id_: str) -> Optional[Partida]:
         """
@@ -216,7 +295,10 @@ class Game(Entity):
             return None
 
         partida = self.__get_last_partida()
-        Game.__filter_hands(partida, user_id_)
+
+        if partida:
+            Game.__filter_hands(partida, user_id_)
+
         return partida
 
     @staticmethod
@@ -240,3 +322,10 @@ class Game(Entity):
             if carta.get("rodada") is not None:
                 return True
         return False
+
+    def game_to_return(self):
+        dict_to_return = dict(self)
+        dict_to_return.pop("senha")
+        if len(dict_to_return["partidas"]) >= 1:
+            dict_to_return["partidas"] = dict_to_return["partidas"][:-1]
+        return dict_to_return

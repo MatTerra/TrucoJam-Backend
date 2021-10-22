@@ -1,7 +1,7 @@
 from pytest import raises
 
 from test.unittests import *
-from utils.entity.game import GameStatus
+from utils.entity.game import Game, GameStatus
 from utils.exceptions.game_over_exception import GameOverException
 from utils.exceptions.not_user_turn_exception import NotUserTurnException
 from utils.exceptions.user_not_in_game_exception import UserNotInGameException
@@ -65,6 +65,40 @@ class TestPlay():
         assert game_with_players_and_hands.pontuacao == [0, 1]
 
     @staticmethod
+    def test_won_should_add_partida(game_with_players_and_hands: Game):
+        TestPlay.reset_partida(game_with_players_and_hands)
+
+        game_with_players_and_hands.play(id_, 0)
+        game_with_players_and_hands.play(TOKEN_INFO.get("sub"), 0)
+        game_with_players_and_hands.play("computer1", 0)
+        game_with_players_and_hands.play("computer2", 1)
+
+        game_with_players_and_hands.play("computer2", 0)
+        game_with_players_and_hands.play(id_, 1)
+        game_with_players_and_hands.play(TOKEN_INFO.get("sub"), 1)
+        res = game_with_players_and_hands.play("computer1", 1)
+
+        assert len(game_with_players_and_hands.partidas) == 2
+
+    @staticmethod
+    def test_won_game_shouldnt_add_partida(game_with_players_and_hands: Game):
+        TestPlay.reset_partida(game_with_players_and_hands)
+        game_with_players_and_hands.partidas[0]["valor"] = 12
+
+        game_with_players_and_hands.play(id_, 0)
+        game_with_players_and_hands.play(TOKEN_INFO.get("sub"), 0)
+        game_with_players_and_hands.play("computer1", 0)
+        game_with_players_and_hands.play("computer2", 1)
+
+        game_with_players_and_hands.play("computer2", 0)
+        game_with_players_and_hands.play(id_, 1)
+        game_with_players_and_hands.play(TOKEN_INFO.get("sub"), 1)
+        res = game_with_players_and_hands.play("computer1", 1)
+
+        assert len(game_with_players_and_hands.partidas) == 1
+        assert game_with_players_and_hands.status == GameStatus.Encerrado
+
+    @staticmethod
     def test_won_with_3_should_add_points(game_with_players_and_hands):
         TestPlay.reset_partida(game_with_players_and_hands)
         game_with_players_and_hands.partidas[-1]["valor"] = 3
@@ -78,7 +112,7 @@ class TestPlay():
         # round 2
         game_with_players_and_hands.play("computer2", 2)
         game_with_players_and_hands.play(id_, 1)
-        game_with_players_and_hands.play(TOKEN_INFO.get("sub"), 2) # winner
+        game_with_players_and_hands.play(TOKEN_INFO.get("sub"), 2)  # winner
         game_with_players_and_hands.play("computer1", 0)
 
         assert game_with_players_and_hands.pontuacao == [0, 3]

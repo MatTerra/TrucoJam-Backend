@@ -97,9 +97,11 @@ class TestGameAPI:
 
     @staticmethod
     def test_create(dao_mock: Mock, game: Game):
-        res = game_api.create.__wrapped__(dict(game), dao_mock,
+        res = game_api.create.__wrapped__({}, dao_mock,
                                           token_info=TOKEN_INFO)
 
-        assert TOKEN_INFO["sub"] in game.jogadores
-        dao_mock.create.assert_called_with(entity=game)
-        assert res == (201, "Game created", {"Game": dict(game)})
+        print(res)
+        assert TOKEN_INFO["sub"] in res[2]["Game"]["jogadores"]
+        dao_mock.create.assert_called()
+        assert res[0] == 201
+        assert res[1] == "Game created"

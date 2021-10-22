@@ -34,3 +34,6 @@ class Deck:
         This method shuffles the deck of cards at random.
         """
         shuffle(self.cards)
+
+    def buy_card(self) -> Card:
+        return self.cards.pop(0)
