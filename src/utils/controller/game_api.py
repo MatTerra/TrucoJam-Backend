@@ -160,13 +160,17 @@ def start_game(id_: str, dao: MongoDAO, token_info: dict):
     user_id_ = token_info.get("sub")
 
     if not game:
-        return error_response(404, "This game doesn't exist", {"id_": id_})
+        return game_doesnt_exist_response(id_)
 
     game.create_partida(user_id_)
     dao.update(game)
     return success_response(201, "Game started", {
         "Game": game.game_to_return()
     })
+
+
+def game_doesnt_exist_response(id_):
+    return error_response(404, "This game doesn't exist", {"id_": id_})
 
 
 @use_dao(GameDAO, "Unable to join game")
@@ -188,7 +192,7 @@ def join(id_: str, password: dict = None, token_info: dict = None,
     senha = password.get("senha")
 
     if not game:
-        return error_response(404, "This game doesn't exist", {"id_": id_})
+        return game_doesnt_exist_response(id_)
 
     game.join(user_id_, senha)
 
@@ -206,7 +210,7 @@ def join_team(id_: str, team_id_: str, token_info: dict = None,
     user_id_ = token_info.get("sub")
 
     if not game:
-        return error_response(404, "This game doesn't exist", {"id_": id_})
+        return game_doesnt_exist_response(id_)
 
     game.join_team(user_id_, team_id_)
 
