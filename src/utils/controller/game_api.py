@@ -68,9 +68,10 @@ def read(length: int = 20, offset: int = 0,
     total, results = dao.get_all(length=length, offset=offset,
                                  filters=filters if filters else None)
     return success_response(message="List of game",
-                            data={"total": total, "results": [dict(result)
-                                                              for result
-                                                              in results]})
+                            data={"total": total,
+                                  "results": [result.game_to_return()
+                                              for result
+                                              in results]})
 
 
 @use_dao(GameDAO, "Unable to retrieve game")
@@ -79,6 +80,7 @@ def read_one(id_: str, dao: MongoDAO = None, token_info: dict = None):
     """
     Recovers a single game from the database
 
+    :param token_info:
     :param id_: ID of the game to recover
     :param dao: The DAO to use to communicate with the database
     :return:

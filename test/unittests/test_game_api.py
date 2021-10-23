@@ -39,7 +39,7 @@ class TestGameAPI:
             dao=dao_mock,
             token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 1, "results": [
-            dict(game)
+            game.game_to_return()
         ]})
         dao_mock.get_all.assert_called_with(length=20, offset=0, filters=None)
 
@@ -49,7 +49,7 @@ class TestGameAPI:
         res = game_api.read.__wrapped__(
             length=2, dao=dao_mock, token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 1, "results": [
-            dict(game)
+            game.game_to_return()
         ]})
         dao_mock.get_all.assert_called_with(length=2, offset=0, filters=None)
 
@@ -60,7 +60,7 @@ class TestGameAPI:
             offset=2, dao=dao_mock,
             token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 3, "results": [
-            dict(game)
+            game.game_to_return()
         ]})
         dao_mock.get_all.assert_called_with(length=20, offset=2, filters=None)
 
