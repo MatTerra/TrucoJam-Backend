@@ -220,14 +220,14 @@ class Game(Entity):
             raise UserAlreadyInTeamException(f"User {user_id_} tried to join "
                                              f"the {team_id_} team twice")
 
-        if team_id_ not in range(0, 1):
+        if team_id_ not in [0, 1]:
             raise InvalidTeamException(f"Team index {team_id_} "
                                        f"out of range.")
 
         if len(self.times[team_id_]) == 2:
             raise FullTeamException(f"Team {team_id_} is already full")
 
-        if team:
+        if team is not None:
             self.times[team].remove(user_id_)
 
         self.times[team_id_].append(user_id_)

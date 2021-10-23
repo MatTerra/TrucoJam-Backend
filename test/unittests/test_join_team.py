@@ -7,20 +7,33 @@ from nova_api import dao
 from utils.controller import game_api
 from utils.entity.game import Game
 from test.unittests import *
+from utils.exceptions.invalid_team_exception import InvalidTeamException
 from utils.exceptions.user_already_in_game_exception import \
     UserAlreadyInGameException
 from utils.exceptions.wrong_password_exception import WrongPasswordException
 
-# class TestJoinTeam():
-#     @staticmethod
-#     def test_Should_Return_403_if_team_doesnt_exist(dao_mock,game,):
-#         team_id_ = 3
-#         dao_mock.get.return_value = game
-#         res = game_api.join_team.__wrapped__(id_=id_,
-#                                         team_id_= team_id_,
-#                                         token_info=TOKEN_INFO,
-#                                         dao=dao_mock)
-#
-#
-#         assert res == (412, "This team doesn't exist", {"team_id_": team_id_})
-#         dao_mock.update.assert_not_called()
+
+class TestJoinTeam():
+    @staticmethod
+    @mark.parametrize("team", [
+        -1, 2, 3, "1"
+    ])
+    def test_join_team_not_0_1_should_raise(team, game_with_players):
+        with raises(InvalidTeamException):
+            game_with_players.join_team(id_, team)
+
+    @staticmethod
+    @mark.parametrize("team", [
+        0, 1
+    ])
+    def test_join_team_should_add_to_team(team, game_with_players):
+        game_with_players.join_team("computer1", team)
+        assert "computer1" in game_with_players.times[team]
+
+    @staticmethod
+    def test_join_team_may_change_team(game_with_players):
+        game_with_players.join_team(id_, 0)
+        assert id_ in game_with_players.times[0]
+        game_with_players.join_team(id_, 1)
+        assert id_ not in game_with_players.times[0]
+        assert id_ in game_with_players.times[1]
