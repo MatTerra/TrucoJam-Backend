@@ -204,8 +204,8 @@ def join(id_: str, password: dict = None, token_info: dict = None,
 
 @use_dao(GameDAO, "Unable to join team in game")
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
-def join_team(id_: str, team_id_: str, token_info: dict = None,
-              dao: GameDAO = None):
+def join_team(id_: str, team_id_: str, dao: GameDAO = None,
+              token_info: dict = None):
     game: Game = dao.get(id_=id_)
     user_id_ = token_info.get("sub")
 
@@ -213,6 +213,8 @@ def join_team(id_: str, team_id_: str, token_info: dict = None,
         return game_doesnt_exist_response(id_)
 
     game.join_team(user_id_, team_id_)
+
+    dao.update(game)
 
     return success_response(200, "User joined team",
                             {"Game": game.game_to_return()})
