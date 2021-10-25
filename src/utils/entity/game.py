@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional
 
+from functools import reduce
+
 from nova_api.entity import Entity
 
 from utils.entity.deck import Deck
@@ -254,6 +256,27 @@ class Game(Entity):
             self.times[team].remove(user_id_)
 
         self.__join_team(user_id_, team_id_)
+
+    def join_team_bot(self, team_id_: int):
+        if self.__get_last_partida():
+            raise GameAlreadyStartedException(f"User tried to add "
+                                              f"bot to team after game start.")
+
+        if team == team_id_:
+            raise UserAlreadyInTeamException(f"Computer already exists"
+                                             f"on the team")
+
+        if team_id_ not in [0, 1]:
+            raise InvalidTeamException(f"Team index {team_id_} "
+                                       f"out of range.")
+        if len(self.times[team_id_]) == 2:
+            raise FullTeamException(f"Team {team_id_} is already full")
+
+        computer_number = reduce(lambda previous, next: (next.find("computer") != -1) + previous, sum(self.times, []), 0)
+        computer_name = 'computer' + str(computer_number) 
+
+        self.times[team_id_].append(computer_name)
+
 
     def __join_team(self, user_id_, team_id_):
         self.times[team_id_].append(user_id_)
