@@ -85,7 +85,7 @@ def read_one(id_: str, dao: MongoDAO = None, token_info: dict = None):
     :param dao: The DAO to use to communicate with the database
     :return:
     """
-    
+
     result = dao.get(id_=id_)
     if not result:
         return success_response(status_code=404,
@@ -94,7 +94,7 @@ def read_one(id_: str, dao: MongoDAO = None, token_info: dict = None):
 
     if token_info.get("sub") not in result.jogadores:
         return error_response(403, "Player not in game", {"id_": id_})
-        
+
     return success_response(message="Game retrieved",
                             data={"Game": result.game_to_return()})
 
@@ -224,17 +224,17 @@ def join_team(id_: str, team_id_: str, dao: GameDAO = None,
 
 @use_dao(GameDAO, "Unable to join team in game")
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
-def join_team_bot(id_: str, team_id_: str, dao: GameDAO = None,
-              token_info: dict = None):
+def join_team_bot(id_: str, team_id_: int, dao: GameDAO = None,
+                  token_info: dict = None):
     game: Game = dao.get(id_=id_)
     user_id_ = token_info.get("sub")
 
     if not game:
         return game_doesnt_exist_response(id_)
 
-    game.join_team_bot(team_id_)
+    game.join_team_bot(user_id_, team_id_)
 
     dao.update(game)
 
-    return success_response(200, "User joined team",
+    return success_response(200, "Bot joined team",
                             {"Game": game.game_to_return()})

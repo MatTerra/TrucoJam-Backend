@@ -257,26 +257,38 @@ class Game(Entity):
 
         self.__join_team(user_id_, team_id_)
 
-    def join_team_bot(self, team_id_: int):
+    def join_team_bot(self, user_id_: str, team_id_: int):
+        if user_id_ not in self.jogadores:
+            raise UserNotInGameException("User tried to join a bot in a "
+                                         "game he is not in")
+
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException("Tried to create a partida in an ended "
+                                    "game")
+
         if self.__get_last_partida():
             raise GameAlreadyStartedException(f"User tried to add "
                                               f"bot to team after game start.")
 
-        if team == team_id_:
-            raise UserAlreadyInTeamException(f"Computer already exists"
-                                             f"on the team")
-
         if team_id_ not in [0, 1]:
             raise InvalidTeamException(f"Team index {team_id_} "
                                        f"out of range.")
+
         if len(self.times[team_id_]) == 2:
             raise FullTeamException(f"Team {team_id_} is already full")
 
-        computer_number = reduce(lambda previous, next: (next.find("computer") != -1) + previous, sum(self.times, []), 0)
-        computer_name = 'computer' + str(computer_number) 
+        computer_number = reduce(
+            lambda previous, nxt: (nxt.find("computer") != -1) + previous,
+            sum(self.times, []),
+            1
+        )
+        computer_name = 'computer' + str(computer_number)
+        print(computer_name)
 
-        self.times[team_id_].append(computer_name)
+        if computer_name not in self.jogadores:
+            raise UserNotInGameException("No more bots to add to teams")
 
+        self.__join_team(computer_name, team_id_)
 
     def __join_team(self, user_id_, team_id_):
         self.times[team_id_].append(user_id_)
