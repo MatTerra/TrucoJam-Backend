@@ -4,8 +4,8 @@ from nova_api import NovaAPIException
 
 
 @dataclass
-class NotWaitingForPlayersException(NovaAPIException):
+class GameNotReadyException(NovaAPIException):
     status_code: int = field(default=412, init=False)
-    message: str = field(default="The game is not waiting for players",
+    message: str = field(default="The game is not ready to start",
                          init=False)
-    error_code: int = field(default=41201, init=False)
+    error_code: int = field(default=41207, init=False)

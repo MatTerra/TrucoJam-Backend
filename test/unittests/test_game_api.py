@@ -39,7 +39,7 @@ class TestGameAPI:
             dao=dao_mock,
             token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 1, "results": [
-            dict(game)
+            game.game_to_return()
         ]})
         dao_mock.get_all.assert_called_with(length=20, offset=0, filters=None)
 
@@ -49,7 +49,7 @@ class TestGameAPI:
         res = game_api.read.__wrapped__(
             length=2, dao=dao_mock, token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 1, "results": [
-            dict(game)
+            game.game_to_return()
         ]})
         dao_mock.get_all.assert_called_with(length=2, offset=0, filters=None)
 
@@ -60,7 +60,7 @@ class TestGameAPI:
             offset=2, dao=dao_mock,
             token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 3, "results": [
-            dict(game)
+            game.game_to_return()
         ]})
         dao_mock.get_all.assert_called_with(length=20, offset=2, filters=None)
 
@@ -73,7 +73,7 @@ class TestGameAPI:
                                             token_info=TOKEN_INFO)
 
         dao_mock.get.assert_called_with(id_=game.id_)
-        assert res == (200, "Game retrieved", {"Game": dict(game)})
+        assert res == (200, "Game retrieved", {"Game": game.game_to_return()})
 
     @staticmethod
     def test_read_one_found_player_not_in_game(dao_mock: Mock, game: Game):
@@ -97,9 +97,23 @@ class TestGameAPI:
 
     @staticmethod
     def test_create(dao_mock: Mock, game: Game):
-        res = game_api.create.__wrapped__(dict(game), dao_mock,
+        res = game_api.create.__wrapped__({}, dao_mock,
                                           token_info=TOKEN_INFO)
 
-        assert TOKEN_INFO["sub"] in game.jogadores
-        dao_mock.create.assert_called_with(entity=game)
-        assert res == (201, "Game created", {"Game": dict(game)})
+        print(res)
+        assert TOKEN_INFO["sub"] in res[2]["Game"]["jogadores"]
+        dao_mock.create.assert_called()
+        assert res[0] == 201
+        assert res[1] == "Game created"
+
+    @staticmethod
+    def test_join_team(dao_mock: Mock, game_with_players):
+        dao_mock.get.return_value = game_with_players
+        res = game_api.join_team.__wrapped__(id_, 1, dao_mock,
+                                             token_info=TOKEN_INFO)
+
+        print(res)
+        assert TOKEN_INFO["sub"] in res[2]["Game"]["times"][1]
+        dao_mock.update.assert_called()
+        assert res[0] == 200
+        assert res[1] == "User joined team"

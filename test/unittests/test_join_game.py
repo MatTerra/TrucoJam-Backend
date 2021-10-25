@@ -53,7 +53,6 @@ class TestJoinGame():
                                  'last_modified_datetime': dict(game).get(
                                      "last_modified_datetime"),
                                  'pontuacao': [0, 0],
-                                 'senha': '123',
                                  'times': [[], []], 'partidas': [],
                                  'jogadores': [TOKEN_INFO["sub"]],
                                  'status': 0}})
@@ -86,7 +85,6 @@ class TestJoinGame():
                                  'last_modified_datetime': dict(game).get(
                                      "last_modified_datetime"),
                                  'pontuacao': [0, 0],
-                                 'senha': '',
                                  'times': [[], []], 'partidas': [],
                                  'jogadores': [TOKEN_INFO["sub"]],
                                  'status': 0}})
