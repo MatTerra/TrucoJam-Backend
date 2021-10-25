@@ -85,8 +85,9 @@ def read_one(id_: str, dao: MongoDAO = None, token_info: dict = None):
     :param dao: The DAO to use to communicate with the database
     :return:
     """
+    
     result = dao.get(id_=id_)
-
+    game = Game(senha=result.get("senha", ""))
     if not result:
         return success_response(status_code=404,
                                 message="Game not found in database",
@@ -96,7 +97,7 @@ def read_one(id_: str, dao: MongoDAO = None, token_info: dict = None):
         return error_response(403, "Player not in game", {"id_": id_})
 
     return success_response(message="Game retrieved",
-                            data={"Game": result.game_to_result()})
+                            data={"Game": game.game_to_result()})
 
 
 @use_dao(GameDAO, "Unable to create game")
