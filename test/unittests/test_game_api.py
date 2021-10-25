@@ -73,7 +73,7 @@ class TestGameAPI:
                                             token_info=TOKEN_INFO)
 
         dao_mock.get.assert_called_with(id_=game.id_)
-        assert res == (200, "Game retrieved", {"Game": dict(game)})
+        assert res == (200, "Game retrieved", {"Game": game.game_to_return()})
 
     @staticmethod
     def test_read_one_found_player_not_in_game(dao_mock: Mock, game: Game):
