@@ -260,8 +260,8 @@ class Game(Entity):
         if len(self.times[team_id_]) == 2:
             raise FullTeamException(f"Team {team_id_} is already full")
 
-        has_computer = reduce(lambda previous, next: (next.find("computer") != -1) or previous, sum(self.times, []), False)
-        computer_name = 'computer' + ('1' if has_computer else '2') 
+        computer_number = reduce(lambda previous, next: (next.find("computer") != -1) + previous, sum(self.times, []), 0)
+        computer_name = 'computer' + str(computer_number) 
 
         self.times[team_id_].append(computer_name)
 
