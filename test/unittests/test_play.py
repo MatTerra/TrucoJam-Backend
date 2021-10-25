@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from pytest import raises
 
 from test.unittests import *
@@ -160,3 +162,21 @@ class TestPlay():
     @staticmethod
     def test_play_without_partida_should_return_none(game_with_players):
         assert game_with_players.play(id_, 0) is None
+
+    @staticmethod
+    def test_play_with_mixed_order(game_with_players_and_hands):
+        game_with_players_and_hands.partidas = []
+        player_id_ = TOKEN_INFO.get("sub")
+        game_with_players_and_hands.times = [
+            [player_id_, "computer2"], [id_, "computer1"]
+        ]
+        game_with_players_and_hands.create_partida(player_id_)
+
+        before_play = deepcopy(game_with_players_and_hands.get_current_partida(
+            player_id_
+        ))
+        before_play.maos[0]["cartas"][0]["rodada"] = 1
+        before_play.turno = 1
+        res = game_with_players_and_hands.play(player_id_, 0)
+        assert len(res.maos) == 1
+        assert before_play == res
