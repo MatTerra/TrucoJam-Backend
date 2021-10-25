@@ -28,11 +28,12 @@ class TestCreatePartida:
     def test_create_partida_in_not_full_game_should_raise(
             game
     ):
+        game.join(id_, game.senha)
         with raises(GameNotReadyException):
-            game.create_partida()
+            game.create_partida(id_)
 
     @staticmethod
-    def test_create_partida_in_not_full_game_should_raise(
+    def test_create_partida_game_with_human_not_in_team_should_raise(
             game_with_players_and_hands
     ):
         game_with_players_and_hands.times = [[id_], []]
@@ -44,6 +45,7 @@ class TestCreatePartida:
     def test_create_partida(
             game_with_players_and_hands
     ):
+        game_with_players_and_hands.times = [[id_, "computer1"], [TOKEN_INFO.get("sub"), "computer2"]]
         game_with_players_and_hands.partidas = []
         game_with_players_and_hands.create_partida(id_)
         partida = Partida(**game_with_players_and_hands.partidas[0])

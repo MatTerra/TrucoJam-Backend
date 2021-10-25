@@ -55,8 +55,9 @@ class GameStatus(Enum):
     Game status enumeration
     """
     AguardandoJogadores = 0
-    Jogando = 1
-    Encerrado = 2
+    Pronto = 1
+    Jogando = 2
+    Encerrado = 3
 
 
 @dataclass
@@ -118,7 +119,6 @@ class Game(Entity):
         if self.pontuacao[0] >= 12 \
                 or self.pontuacao[1] >= 12:
             self.status = GameStatus.Encerrado
-
 
         partida_to_return = deepcopy(partida)
         Game.__filter_hands(partida_to_return, user_id_)
@@ -220,7 +220,7 @@ class Game(Entity):
         self.jogadores.append(user_id_)
 
         if len(self.jogadores) == 4:
-            self.status = GameStatus.Jogando
+            self.status = GameStatus.Pronto
 
     def join_team(self, user_id_, team_id_):
         team = self.__get_user_team(user_id_)
@@ -243,6 +243,9 @@ class Game(Entity):
         if team is not None:
             self.times[team].remove(user_id_)
 
+        self.__join_team(user_id_, team_id_)
+
+    def __join_team(self, user_id_, team_id_):
         self.times[team_id_].append(user_id_)
 
     def create_partida(self, user_id_):
@@ -258,12 +261,40 @@ class Game(Entity):
             raise GameOverException("Tried to create a partida in an ended "
                                     "game")
 
-        if self.status == GameStatus.AguardandoJogadores \
-                or len(self.times[0]) < 2 \
-                or len(self.times[1]) < 2:
-            raise GameNotReadyException("Game is not ready to start")
+        if self.status == GameStatus.AguardandoJogadores:
+            raise GameNotReadyException("Still waiting for players")
+
+        print(self.times)
+        if self.status == GameStatus.Pronto:
+            if self.__all_human_players_are_in_teams():
+                self.__distribute_computers_on_teams()
+            else:
+                raise GameNotReadyException("Not all players chose a team")
 
         self.__create_partida()
+
+    def __all_human_players_are_in_teams(self):
+        human_players = 4 - len(self.__get_computer_players())
+        players_in_teams = len(self.__get_players_in_playing_order())
+        return human_players <= players_in_teams
+
+    def __distribute_computers_on_teams(self):
+        for computer_player in self.__get_computer_players():
+            print(f"putting {computer_player} in a team")
+            print(f"Teams are {self.times}")
+            if computer_player in self.__get_players_in_playing_order():
+                continue
+            for time in range(TIMES):
+                if self.__team_is_not_full(time):
+                    self.__join_team(computer_player, time)
+                    break
+
+    def __get_computer_players(self):
+        return [player for player in self.jogadores
+                if player.startswith("computer")]
+
+    def __team_is_not_full(self, time):
+        return len(self.times[time]) < 2
 
     def __create_partida(self):
         self.partidas.append(dict(
