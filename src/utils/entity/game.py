@@ -398,6 +398,8 @@ class Game(Entity):
         partida.raise_value(self.__get_user_index(user_id_),
                             self.__get_user_team(user_id_))
 
+        self.partidas[-1] = dict(partida)
+
     def fold_game(self, user_id_):
         if not self.is_user_a_participant(user_id_):
             raise UserNotInGameException(f"User {user_id_} not found in "
@@ -413,3 +415,5 @@ class Game(Entity):
                                         f"a game before start")
 
         partida.fold(self.__get_user_team(user_id_))
+
+        self.partidas[-1] = dict(partida)
