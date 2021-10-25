@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional
 
+from functools import reduce
+
 from nova_api.entity import Entity
 
 from utils.entity.deck import Deck
