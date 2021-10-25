@@ -96,7 +96,7 @@ def read_one(id_: str, dao: MongoDAO = None, token_info: dict = None):
         return error_response(403, "Player not in game", {"id_": id_})
 
     return success_response(message="Game retrieved",
-                            data={"Game": dict(result)})
+                            data={"Game": result.game_to_result()})
 
 
 @use_dao(GameDAO, "Unable to create game")
