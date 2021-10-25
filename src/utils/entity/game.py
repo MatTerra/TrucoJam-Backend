@@ -245,6 +245,27 @@ class Game(Entity):
 
         self.__join_team(user_id_, team_id_)
 
+    def join_team_bot(self, team_id_: int):
+        if self.__get_last_partida():
+            raise GameAlreadyStartedException(f"User tried to add "
+                                              f"bot to team after game start.")
+
+        if team == team_id_:
+            raise UserAlreadyInTeamException(f"Computer already exists"
+                                             f"on the team")
+
+        if team_id_ not in [0, 1]:
+            raise InvalidTeamException(f"Team index {team_id_} "
+                                       f"out of range.")
+        if len(self.times[team_id_]) == 2:
+            raise FullTeamException(f"Team {team_id_} is already full")
+
+        has_computer = reduce(lambda previous, next: (next.find("computer") != -1) or previous, sum(self.times, []), False)
+        computer_name = 'computer' + ('1' if has_computer else '2') 
+
+        self.times[team_id_].append(computer_name)
+
+
     def __join_team(self, user_id_, team_id_):
         self.times[team_id_].append(user_id_)
 
