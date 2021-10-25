@@ -138,7 +138,10 @@ class Game(Entity):
         return None
 
     def __get_user_index(self, user_id_):
-        return sum(zip(*self.times), ()).index(user_id_)
+        return self.__get_players_in_playing_order().index(user_id_)
+
+    def __get_players_in_playing_order(self):
+        return sum(zip(*self.times), ())
 
     def __check_partida_winner(self, partida: Partida) -> Optional[int]:
         """
@@ -270,7 +273,7 @@ class Game(Entity):
                     for carta in [deck.buy_card(),
                                   deck.buy_card(),
                                   deck.buy_card()]]}
-            for jogador in self.jogadores]
+            for jogador in self.__get_players_in_playing_order()]
         return maos
 
     def get_current_partida(self, user_id_: str) -> Optional[Partida]:

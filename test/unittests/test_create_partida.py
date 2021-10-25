@@ -56,3 +56,17 @@ class TestCreatePartida:
             assert len(mao["cartas"]) == 3
             for card in mao["cartas"]:
                 assert card["rodada"] is None
+
+    @staticmethod
+    def test_create_with_mixed_order(game_with_players_and_hands):
+        player_id_ = TOKEN_INFO.get("sub")
+        game_with_players_and_hands.times = [
+            [player_id_, "computer2"], [id_, "computer1"]
+        ]
+        game_with_players_and_hands.partidas = []
+        game_with_players_and_hands.create_partida(id_)
+        partida = Partida(**game_with_players_and_hands.partidas[0])
+        assert partida.maos[0]["jogador"] == player_id_
+        assert partida.maos[1]["jogador"] == id_
+        assert partida.maos[2]["jogador"] == "computer2"
+        assert partida.maos[3]["jogador"] == "computer1"
