@@ -70,7 +70,7 @@ def play(id_: str, card: dict, token_info: dict = None, dao: GameDAO = None):
 
 @use_dao(GameDAO, "Unable to raise partida")
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=False)
-def raise_(id_: str, token_info: dict = None, dao: GameDAO = None):
+def raise_request(id_: str, token_info: dict = None, dao: GameDAO = None):
     """
     Raises the stakes for the current partida by 3 points. The player may \
     not raise if the other player hasn't decided to fold or go.
@@ -80,19 +80,40 @@ def raise_(id_: str, token_info: dict = None, dao: GameDAO = None):
     :param dao: The database connection to use.
     :return: The partida after raise
     """
-    pass
-
+    game: Game = dao.get(id_=id_)
+    user_id_ = token_info.get("sub")
+    game.raise_request_game(user_id_)
+    dao.update(game)
+    return success_response(200, "raise request sent",{"partida": dict(game.get_current_partida(user_id_))})
 
 @use_dao(GameDAO, "Unable to fold partida")
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=False)
-def fold(id_: str, token_info: dict = None, dao: GameDAO = None):
+def fold(id_: str,raise_response: str, token_info: dict = None, dao: GameDAO = None):
     """
-    Give up on the current partida after a raise. May only be issued \
-    after a raise.
+    Response after a raise request. May only be issued \
+    after a raise request. 
 
     :param id_: The Game in which to fold the partida
+    :param raise_response: user response from raise request
     :param token_info: The user token claims
     :param dao: The database connection to use.
-    :return: The partida after fold
+    :return: Acceptance or denial of raise
     """
-    pass
+    game: Game = dao.get(id_=id_)
+    user_id_ = token_info.get("sub")
+    if raise_response == "fold":
+        game.fold_game(user_id_)
+        dao.update(game)
+        return success_response(200, "Game folded",{"partida": dict(game.get_current_partida(user_id_))})
+
+    if raise_response == "accept":
+        dao.update(game)
+        return success_response(204, "truco accepted",{"partida": dict(game.get_current_partida(user_id_))})
+    if raise_response == "truco":
+        game.raise_request_game(user_id_)
+        dao.update(game)
+        return success_response(200, "partida value raised",{"partida": dict(game.get_current_partida(user_id_))})
+
+        
+
+

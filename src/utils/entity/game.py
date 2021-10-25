@@ -329,3 +329,15 @@ class Game(Entity):
         if len(dict_to_return["partidas"]) >= 1:
             dict_to_return["partidas"] = dict_to_return["partidas"][:-1]
         return dict_to_return
+    
+    def raise_request_game(self,user_id_):
+        team_id_= self.__get_user_team(user_id_)
+        user_index_= self.__get_user_index(user_id_)
+        partida =self.__get_last_partida() 
+        partida.raise_request(team_id_,user_index_)
+
+    def fold_game(self,user_id_):
+        team_id_= self.__get_user_team(user_id_)
+        partida =self.__get_last_partida() 
+        partida.fold(team_id_)
+  

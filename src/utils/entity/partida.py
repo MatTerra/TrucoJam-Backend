@@ -8,6 +8,14 @@ from utils.exceptions.invalid_card_exception import InvalidCardException
 from utils.exceptions.not_user_turn_exception import NotUserTurnException
 from utils.exceptions.partida_over_exception import PartidaOverException
 
+def may_rise_default() -> List[bool]:
+    """
+    Simple false list generator
+
+    :return: false list 
+    """
+    return [False, False]
+
 
 @dataclass
 class Partida:
@@ -15,7 +23,7 @@ class Partida:
     valor: int = field(default=1)
     vencedor: int = field(default=None)
     maos: List[dict] = field(default_factory=list)
-    may_raise: bool = field(default=True)
+    may_raise: list[bool] = field(default_factory=may_rise_default)
 
     def __iter__(self):
         for key, value in self.__dict__.items():
@@ -94,3 +102,30 @@ class Partida:
             maos_.remove([])
 
         return maos_
+
+    def fold(self,team_id_):
+        self.valor-=3
+        if self.valor== 0:
+            self.valor = 1
+        self.vencedor = 1 - team_id_
+
+        
+        
+    
+    
+    
+        
+
+    def raise_request(self,team_id_,user_index):
+        if user_index != self.turno:
+            raise NotUserTurnException("User tried to raise out of turn")
+        if self.may_raise[team_id_]: 
+            self.may_raise[team_id_] = False
+            self.may_raise[1 - team_id_] = True
+            if self.valor == 1:
+                self.valor +=2
+            else:
+                self.valor +=3 
+            return team_id_
+
+
