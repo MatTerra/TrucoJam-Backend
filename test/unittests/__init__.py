@@ -147,12 +147,12 @@ def partida_with_hands():
             "cartas": [
                 {
                     "naipe": Suit.PAUS.value,
-                    "valor": Value.THREE.value,
+                    "valor": Value.MANILHA.value,
                     "rodada": None
                 },
                 {
                     "naipe": Suit.PAUS.value,
-                    "valor": Value.MANILHA.value,
+                    "valor": Value.THREE.value,
                     "rodada": None
                 },
                 {

@@ -101,7 +101,12 @@ class Game(Entity):
         user_index = self.__get_user_index(user_id_)
         partida.play(user_index, card_id_)
 
-        vencedor = self.__check_partida_winner(partida)
+        vencedor = None
+        while self.__is_computer_next(partida) and not vencedor:
+            partida.play(partida.turno, partida.get_current_round() - 1)
+            vencedor = self.__check_partida_winner(partida)
+            if vencedor:
+                break
 
         self.partidas[-1] = dict(partida)
 
@@ -114,10 +119,15 @@ class Game(Entity):
                 or self.pontuacao[1] >= 12:
             self.status = GameStatus.Encerrado
 
+
         partida_to_return = deepcopy(partida)
         Game.__filter_hands(partida_to_return, user_id_)
 
         return partida_to_return
+
+    def __is_computer_next(self, partida):
+        return self.__get_players_in_playing_order()[
+            partida.turno].startswith("computer")
 
     def is_user_a_participant(self, user_id_: str) -> bool:
         """
@@ -148,7 +158,7 @@ class Game(Entity):
         Checks if the partida has been won by any team. If it has, registers it
         and sums the points
         :param partida: Partida to check
-        :return:
+        :return: The winning team index or None
         """
         winners = [self.jogadores[partida.get_round_winner(round_)]
                    for round_ in range(ROUNDS_IN_PARTIDA)
