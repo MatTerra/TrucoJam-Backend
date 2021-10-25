@@ -28,11 +28,12 @@ class TestCreatePartida:
     def test_create_partida_in_not_full_game_should_raise(
             game
     ):
+        game.join(id_, game.senha)
         with raises(GameNotReadyException):
-            game.create_partida()
+            game.create_partida(id_)
 
     @staticmethod
-    def test_create_partida_in_not_full_game_should_raise(
+    def test_create_partida_game_with_human_not_in_team_should_raise(
             game_with_players_and_hands
     ):
         game_with_players_and_hands.times = [[id_], []]
@@ -44,6 +45,10 @@ class TestCreatePartida:
     def test_create_partida(
             game_with_players_and_hands
     ):
+        game_with_players_and_hands.times = [[id_, "computer1"],
+                                             [TOKEN_INFO.get("sub"),
+                                              "computer2"]]
+
         game_with_players_and_hands.partidas = []
         game_with_players_and_hands.create_partida(id_)
         partida = Partida(**game_with_players_and_hands.partidas[0])
@@ -56,3 +61,18 @@ class TestCreatePartida:
             assert len(mao["cartas"]) == 3
             for card in mao["cartas"]:
                 assert card["rodada"] is None
+
+    @staticmethod
+    def test_create_with_mixed_order(game_with_players_and_hands):
+        player_id_ = TOKEN_INFO.get("sub")
+        game_with_players_and_hands.times = [
+            [player_id_, "computer2"], [id_, "computer1"]
+        ]
+        print(game_with_players_and_hands.partidas[0])
+        game_with_players_and_hands.partidas = []
+        game_with_players_and_hands.create_partida(id_)
+        partida = Partida(**game_with_players_and_hands.partidas[0])
+        assert partida.maos[0]["jogador"] == player_id_
+        assert partida.maos[1]["jogador"] == id_
+        assert partida.maos[2]["jogador"] == "computer2"
+        assert partida.maos[3]["jogador"] == "computer1"

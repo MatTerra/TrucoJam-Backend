@@ -55,8 +55,9 @@ class GameStatus(Enum):
     Game status enumeration
     """
     AguardandoJogadores = 0
-    Jogando = 1
-    Encerrado = 2
+    Pronto = 1
+    Jogando = 2
+    Encerrado = 3
 
 
 @dataclass
@@ -101,7 +102,12 @@ class Game(Entity):
         user_index = self.__get_user_index(user_id_)
         partida.play(user_index, card_id_)
 
-        vencedor = self.__check_partida_winner(partida)
+        vencedor = None
+        while self.__is_computer_next(partida) and not vencedor:
+            partida.play(partida.turno, partida.get_current_round() - 1)
+            vencedor = self.__check_partida_winner(partida)
+            if vencedor:
+                break
 
         self.partidas[-1] = dict(partida)
 
@@ -118,6 +124,15 @@ class Game(Entity):
         Game.__filter_hands(partida_to_return, user_id_)
 
         return partida_to_return
+
+    def __is_computer_next(self, partida):
+        return self.__get_players_in_playing_order()[
+            partida.turno].startswith("computer")
+
+    def __create_partida(self):
+        self.partidas.append(dict(
+            Partida(maos=self.__generate_player_hands())
+        ))
 
     def is_user_a_participant(self, user_id_: str) -> bool:
         """
@@ -138,14 +153,17 @@ class Game(Entity):
         return None
 
     def __get_user_index(self, user_id_):
-        return sum(zip(*self.times), ()).index(user_id_)
+        return self.__get_players_in_playing_order().index(user_id_)
+
+    def __get_players_in_playing_order(self):
+        return sum(zip(*self.times), ())
 
     def __check_partida_winner(self, partida: Partida) -> Optional[int]:
         """
         Checks if the partida has been won by any team. If it has, registers it
         and sums the points
         :param partida: Partida to check
-        :return:
+        :return: The winning team index or None
         """
         winners = [self.jogadores[partida.get_round_winner(round_)]
                    for round_ in range(ROUNDS_IN_PARTIDA)
@@ -207,10 +225,15 @@ class Game(Entity):
         self.jogadores.append(user_id_)
 
         if len(self.jogadores) == 4:
-            self.status = GameStatus.Jogando
+            self.status = GameStatus.Pronto
 
     def join_team(self, user_id_, team_id_):
         team = self.__get_user_team(user_id_)
+
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException(f"User {user_id_} tried to "
+                                    f"change team in a game that already "
+                                    f"ended.")
 
         if self.__get_last_partida():
             raise GameAlreadyStartedException(f"User {user_id_} tried to "
@@ -230,9 +253,16 @@ class Game(Entity):
         if team is not None:
             self.times[team].remove(user_id_)
 
+        self.__join_team(user_id_, team_id_)
+
+    def __join_team(self, user_id_, team_id_):
         self.times[team_id_].append(user_id_)
 
     def create_partida(self, user_id_):
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException("Tried to create a partida in an ended "
+                                    "game")
+
         if not self.is_user_a_participant(user_id_):
             raise UserNotInGameException(f"User {user_id_} not found in "
                                          f"game {self.id_}.")
@@ -241,16 +271,37 @@ class Game(Entity):
             raise PartidaOngoingException("Tried to create a partida in a "
                                           "game with a partida in progress")
 
-        if self.status == GameStatus.Encerrado:
-            raise GameOverException("Tried to create a partida in an ended "
-                                    "game")
+        if self.status == GameStatus.AguardandoJogadores:
+            raise GameNotReadyException("Still waiting for players")
 
-        if self.status == GameStatus.AguardandoJogadores \
-                or len(self.times[0]) < 2 \
-                or len(self.times[1]) < 2:
-            raise GameNotReadyException("Game is not ready to start")
+        if self.status == GameStatus.Pronto:
+            if self.__all_human_players_are_in_teams():
+                self.__distribute_computers_on_teams()
+            else:
+                raise GameNotReadyException("Not all players chose a team")
 
         self.__create_partida()
+
+    def __all_human_players_are_in_teams(self):
+        human_players = 4 - len(self.__get_computer_players())
+        players_in_teams = len(self.__get_players_in_playing_order())
+        return human_players <= players_in_teams
+
+    def __distribute_computers_on_teams(self):
+        for computer_player in self.__get_computer_players():
+            if computer_player in self.__get_players_in_playing_order():
+                continue
+            for time in range(TIMES):
+                if self.__team_is_not_full(time):
+                    self.__join_team(computer_player, time)
+                    break
+
+    def __get_computer_players(self):
+        return [player for player in self.jogadores
+                if player.startswith("computer")]
+
+    def __team_is_not_full(self, time):
+        return len(self.times[time]) < 2
 
     def __create_partida(self):
         self.partidas.append(dict(
@@ -270,7 +321,7 @@ class Game(Entity):
                     for carta in [deck.buy_card(),
                                   deck.buy_card(),
                                   deck.buy_card()]]}
-            for jogador in self.jogadores]
+            for jogador in self.__get_players_in_playing_order()]
         return maos
 
     def get_current_partida(self, user_id_: str) -> Optional[Partida]:
@@ -329,15 +380,36 @@ class Game(Entity):
         if len(dict_to_return["partidas"]) >= 1:
             dict_to_return["partidas"] = dict_to_return["partidas"][:-1]
         return dict_to_return
-    
-    def raise_request_game(self,user_id_):
-        team_id_= self.__get_user_team(user_id_)
-        user_index_= self.__get_user_index(user_id_)
-        partida =self.__get_last_partida() 
-        partida.raise_request(team_id_,user_index_)
 
-    def fold_game(self,user_id_):
-        team_id_= self.__get_user_team(user_id_)
-        partida =self.__get_last_partida() 
-        partida.fold(team_id_)
-  
+    def raise_game(self, user_id_):
+        if not self.is_user_a_participant(user_id_):
+            raise UserNotInGameException(f"User {user_id_} not found in "
+                                         f"game {self.id_}.")
+
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException(f"Game {self.id_} is already over.")
+
+        partida = self.__get_last_partida()
+
+        if not partida:
+            raise GameNotReadyException(f"User {user_id_} tried to raise on "
+                                        f"a game before start")
+
+        partida.raise_value(self.__get_user_index(user_id_),
+                            self.__get_user_team(user_id_))
+
+    def fold_game(self, user_id_):
+        if not self.is_user_a_participant(user_id_):
+            raise UserNotInGameException(f"User {user_id_} not found in "
+                                         f"game {self.id_}.")
+
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException(f"Game {self.id_} is already over.")
+
+        partida = self.__get_last_partida()
+
+        if not partida:
+            raise GameNotReadyException(f"User {user_id_} tried to raise on "
+                                        f"a game before start")
+
+        partida.fold(self.__get_user_team(user_id_))

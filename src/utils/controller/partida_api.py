@@ -82,7 +82,7 @@ def raise_request(id_: str, token_info: dict = None, dao: GameDAO = None):
     """
     game: Game = dao.get(id_=id_)
     user_id_ = token_info.get("sub")
-    game.raise_request_game(user_id_)
+    game.raise_game(user_id_)
     dao.update(game)
     return success_response(200, "raise request sent",{"partida": dict(game.get_current_partida(user_id_))})
 
@@ -110,7 +110,7 @@ def fold(id_: str,raise_response: str, token_info: dict = None, dao: GameDAO = N
         dao.update(game)
         return success_response(204, "truco accepted",{"partida": dict(game.get_current_partida(user_id_))})
     if raise_response == "truco":
-        game.raise_request_game(user_id_)
+        game.raise_game(user_id_)
         dao.update(game)
         return success_response(200, "partida value raised",{"partida": dict(game.get_current_partida(user_id_))})
 

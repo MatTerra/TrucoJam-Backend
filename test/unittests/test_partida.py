@@ -50,7 +50,8 @@ class TestPartida:
         partida_with_hands.play(0, 0)
         partida_with_hands.play(1, 0)
         partida_with_hands.play(2, 0)
-        partida_with_hands.play(3, 0)
+        partida_with_hands.play(3, 1)
+
         partida_with_hands.play(0, 1)
         assert partida_with_hands.turno == 1
         TestPartida.reset_partida(partida_with_hands)
@@ -58,15 +59,17 @@ class TestPartida:
 
     @staticmethod
     def test_round_should_be_incremented(partida_with_hands):
+        TestPartida.reset_partida(partida_with_hands)
         partida_with_hands.play(0, 0)
         partida_with_hands.play(1, 0)
         partida_with_hands.play(2, 0)
-        partida_with_hands.play(3, 0)
+        partida_with_hands.play(3, 1)
         partida_with_hands.play(0, 1)
+
         assert partida_with_hands.maos[0]["cartas"][0]["rodada"] == 1
         assert partida_with_hands.maos[1]["cartas"][0]["rodada"] == 1
         assert partida_with_hands.maos[2]["cartas"][0]["rodada"] == 1
-        assert partida_with_hands.maos[3]["cartas"][0]["rodada"] == 1
+        assert partida_with_hands.maos[3]["cartas"][1]["rodada"] == 1
         assert partida_with_hands.maos[0]["cartas"][1]["rodada"] == 2
         TestPartida.reset_partida(partida_with_hands)
 
@@ -76,13 +79,16 @@ class TestPartida:
         partida_with_hands.play(0, 0)
         partida_with_hands.play(1, 0)
         partida_with_hands.play(2, 0)
-        partida_with_hands.play(3, 1)
-        assert partida_with_hands.turno == 3
         partida_with_hands.play(3, 0)
+
+        assert partida_with_hands.turno == 3
+
+        partida_with_hands.play(3, 1)
         partida_with_hands.play(0, 1)
         partida_with_hands.play(1, 1)
         partida_with_hands.play(2, 1)
         partida_with_hands.vencedor = 1
+
         with raises(PartidaOverException):
             partida_with_hands.play(3, 2)
 
@@ -92,10 +98,12 @@ class TestPartida:
         partida_with_hands.play(0, 0)
         partida_with_hands.play(1, 0)
         partida_with_hands.play(2, 0)
+
         assert partida_with_hands.maos[0]["cartas"][0]["rodada"] == 1
         assert partida_with_hands.maos[1]["cartas"][0]["rodada"] == 1
         assert partida_with_hands.maos[2]["cartas"][0]["rodada"] == 1
-        partida_with_hands.play(3, 1)
+
+        partida_with_hands.play(3, 0)
         assert partida_with_hands.turno == 3
 
     @staticmethod

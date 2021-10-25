@@ -78,6 +78,6 @@ class TestGame:
         game = Game(jogadores=["a", "b", "c"])
 
         game.join(user_id_)
-        assert game.status == GameStatus.Jogando
+        assert game.status == GameStatus.Pronto
 
 
