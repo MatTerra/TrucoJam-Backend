@@ -368,6 +368,7 @@ class Game(Entity):
             else:
                 raise GameNotReadyException("Not all players chose a team")
 
+        self.status = GameStatus.Jogando
         self.__create_partida()
 
     def __all_human_players_are_in_teams(self):
