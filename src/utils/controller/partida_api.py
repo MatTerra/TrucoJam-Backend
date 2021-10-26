@@ -38,7 +38,7 @@ def read(id_: str, token_info: dict = None, dao: GameDAO = None):
                             {"partida": {
                                 **dict(current_partida),
                                 "mao_jogador":
-                                    current_partida.get_player_hand(user_id_)}
+                                    game.get_player_hand(user_id_)}
                             })
 
 
