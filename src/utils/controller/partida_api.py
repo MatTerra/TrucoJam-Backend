@@ -84,11 +84,14 @@ def raise_request(id_: str, token_info: dict = None, dao: GameDAO = None):
     user_id_ = token_info.get("sub")
     game.raise_game(user_id_)
     dao.update(game)
-    return success_response(200, "raise request sent",{"partida": dict(game.get_current_partida(user_id_))})
+    return success_response(200, "raise request sent", {
+        "partida": dict(game.get_current_partida(user_id_))})
+
 
 @use_dao(GameDAO, "Unable to fold partida")
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=False)
-def fold(id_: str,raise_response: str, token_info: dict = None, dao: GameDAO = None):
+def fold(id_: str, raise_response: str, token_info: dict = None,
+         dao: GameDAO = None):
     """
     Response after a raise request. May only be issued \
     after a raise request. 
@@ -104,16 +107,15 @@ def fold(id_: str,raise_response: str, token_info: dict = None, dao: GameDAO = N
     if raise_response == "fold":
         game.fold_game(user_id_)
         dao.update(game)
-        return success_response(200, "Game folded",{"partida": dict(game.get_current_partida(user_id_))})
+        return success_response(200, "Game folded", {
+            "partida": dict(game.get_current_partida(user_id_))})
 
     if raise_response == "accept":
         dao.update(game)
-        return success_response(204, "truco accepted",{"partida": dict(game.get_current_partida(user_id_))})
+        return success_response(204, "truco accepted", {
+            "partida": dict(game.get_current_partida(user_id_))})
     if raise_response == "truco":
         game.raise_game(user_id_)
         dao.update(game)
-        return success_response(200, "partida value raised",{"partida": dict(game.get_current_partida(user_id_))})
-
-        
-
-
+        return success_response(200, "partida value raised", {
+            "partida": dict(game.get_current_partida(user_id_))})

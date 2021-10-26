@@ -57,12 +57,22 @@ class Card:
     valor: Value = field(default=None, compare=True)
 
     def __lt__(self, other):
+        """
+        Less than comparator
+        :param other: The other Card to compare
+        :return: True if less than other, False otherwise
+        """
         return self.valor < other.valor or \
                (self.valor == other.valor
                 and self.valor == Value.MANILHA
                 and self.naipe < other.naipe)
 
     def __gt__(self, other):
+        """
+        Greater than comparator
+        :param other: The other Card to compare
+        :return: True if greater than other, False otherwise
+        """
         return self.valor > other.valor or \
                (self.valor == other.valor
                 and self.valor == Value.MANILHA

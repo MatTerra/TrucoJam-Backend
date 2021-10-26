@@ -255,6 +255,15 @@ def join_team_bot(id_: str, team_id_: int, dao: GameDAO = None,
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
 def remove_team_bot(id_: str, team_id_: int, dao: GameDAO = None,
                     token_info: dict = None):
+    """
+    Removes a bot from a team.
+
+    :param dao: Database connection
+    :param id_: ID of the game to join
+    :param team_id_: ID of the team to remove a bot from
+    :param token_info: User token data
+    :return: Success if the join was successful and false otherwise.
+    """
     game: Game = dao.get(id_=id_)
     user_id_ = token_info.get("sub")
 
