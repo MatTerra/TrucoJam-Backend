@@ -5,7 +5,7 @@ from pytest import mark, raises
 from nova_api import dao
 
 from utils.controller import game_api
-from utils.entity.game import Game
+from utils.entity.game import Game, GameStatus
 from test.unittests import *
 from utils.exceptions.invalid_team_exception import InvalidTeamException
 from utils.exceptions.user_already_in_game_exception import \
@@ -40,7 +40,13 @@ class TestJoinTeam():
 
     @staticmethod
     def test_join_team_computer(game_with_players):
+        game_with_players.jogadores = [id_, TOKEN_INFO.get("sub")]
         game_with_players.join_team_bot(id_, 0)
         assert "computer1" in game_with_players.times[0]
         game_with_players.join_team_bot(id_, 1)
         assert "computer2" in game_with_players.times[1]
+        assert game_with_players.status == GameStatus.Pronto
+        game_with_players.remove_team_bot(id_, 0)
+        assert "computer1" in game_with_players.times[1]
+        assert "computer2" not in game_with_players.times[0]
+        assert game_with_players.status == GameStatus.AguardandoJogadores

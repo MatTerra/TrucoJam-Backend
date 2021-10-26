@@ -263,7 +263,7 @@ class Game(Entity):
                                          "game he is not in")
 
         if self.status == GameStatus.Encerrado:
-            raise GameOverException("Tried to create a partida in an ended "
+            raise GameOverException("Tried to add a bot in an ended "
                                     "game")
 
         if self.__get_last_partida():
@@ -277,18 +277,69 @@ class Game(Entity):
         if len(self.times[team_id_]) == 2:
             raise FullTeamException(f"Team {team_id_} is already full")
 
-        computer_number = reduce(
-            lambda previous, nxt: (nxt.find("computer") != -1) + previous,
-            sum(self.times, []),
-            1
-        )
+        if len(self.jogadores) == 4:
+            raise FullGameException("User tried to add a bot in a full game")
+
+        computer_number = len(
+            [player for player in self.__get_computer_players()]
+        ) + 1
         computer_name = 'computer' + str(computer_number)
-        print(computer_name)
 
-        if computer_name not in self.jogadores:
-            raise UserNotInGameException("No more bots to add to teams")
-
+        self.jogadores.append(computer_name)
         self.__join_team(computer_name, team_id_)
+
+        if len(self.jogadores) == 4:
+            self.status = GameStatus.Pronto
+
+    def remove_team_bot(self, user_id_: str, team_id_: int):
+        if user_id_ not in self.jogadores:
+            raise UserNotInGameException("User tried to join a bot in a "
+                                         "game he is not in")
+
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException("Tried to create a partida in an ended "
+                                    "game")
+
+        if self.__get_last_partida():
+            raise GameAlreadyStartedException(f"User tried to remove "
+                                              f"bot to team after game start.")
+
+        if team_id_ not in [0, 1]:
+            raise InvalidTeamException(f"Team index {team_id_} "
+                                       f"out of range.")
+
+        if len([player for player in self.times[team_id_]
+                if player.startswith("computer")]) == 0:
+            raise UserNotInGameException("User tried to remove computer from "
+                                         "a team without computers")
+
+        self.__reorganize_computers(team_id_)
+
+        if self.status == GameStatus.Pronto:
+            self.status = GameStatus.AguardandoJogadores
+
+    def __reorganize_computers(self, team_id_):
+        old_teams = [deepcopy(self.times[0]), deepcopy(self.times[1])]
+        self.times = [
+            [player for player in time
+             if not player.startswith("computer")]
+            for time in self.times
+        ]
+        computers = self.__get_computer_players()[:-1]
+        for computer in computers:
+            for time in range(TIMES):
+                print(
+                    f"{computer} in {time}: "
+                    f"{self.team_should_have_a_bot(time, old_teams, team_id_)}")
+                if self.team_should_have_a_bot(time, old_teams, team_id_):
+                    self.__join_team(computer, time)
+                    continue
+
+    def team_should_have_a_bot(self, team, old_teams, team_id_to_remove):
+        return (len(self.times[team]) < len(old_teams[team])
+                and team_id_to_remove != team) \
+               or (team_id_to_remove == team
+                   and len(self.times[team]) + 1 < len(old_teams[team]))
 
     def __join_team(self, user_id_, team_id_):
         self.times[team_id_].append(user_id_)
