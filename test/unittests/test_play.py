@@ -45,6 +45,7 @@ class TestPlay():
         game_with_players_and_hands.play(id_, 1)
         res = game_with_players_and_hands.play(TOKEN_INFO.get("sub"), 1)
 
+
         assert res.vencedor == 1
 
     @staticmethod
@@ -119,16 +120,18 @@ class TestPlay():
                             {'naipe': 0, 'rodada': 2, 'valor': 4},
                             {'naipe': 1, 'rodada': None, 'valor': 7}],
                  'jogador': '23f2f1750af74f4b8d38683e4ed1b80b'},
+
                 {'cartas': [{'naipe': 1, 'rodada': 1, 'valor': 7},
                             {'naipe': 1, 'rodada': 2, 'valor': 1}],
                  'jogador': 'computer1'},
                 {'cartas': [{'naipe': 3, 'rodada': 1, 'valor': 7},
                             {'naipe': 3, 'rodada': 2, 'valor': 6}],
                  'jogador': 'computer2'}],
-            'may_raise': True,
+            'may_raise': [True, True],
             'turno': 3,
             'valor': 1,
             'vencedor': 1
+
         }
 
     @staticmethod
@@ -141,6 +144,7 @@ class TestPlay():
     @staticmethod
     def test_play_without_partida_should_return_none(game_with_players):
         assert game_with_players.play(id_, 0) is None
+
 
     @staticmethod
     def test_play_with_mixed_order(game_with_players_and_hands):
@@ -159,3 +163,4 @@ class TestPlay():
         res = game_with_players_and_hands.play(player_id_, 0)
         assert len(res.maos) == 1
         assert before_play == res
+

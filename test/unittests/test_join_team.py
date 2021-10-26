@@ -37,3 +37,10 @@ class TestJoinTeam():
         game_with_players.join_team(id_, 1)
         assert id_ not in game_with_players.times[0]
         assert id_ in game_with_players.times[1]
+
+    @staticmethod
+    def test_join_team_computer(game_with_players):
+        game_with_players.join_team_bot(id_, 0)
+        assert "computer1" in game_with_players.times[0]
+        game_with_players.join_team_bot(id_, 1)
+        assert "computer2" in game_with_players.times[1]

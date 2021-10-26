@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional
 
+from functools import reduce
+
 from nova_api.entity import Entity
 
 from utils.entity.deck import Deck
@@ -129,6 +131,11 @@ class Game(Entity):
         return self.__get_players_in_playing_order()[
             partida.turno].startswith("computer")
 
+    def __create_partida(self):
+        self.partidas.append(dict(
+            Partida(maos=self.__generate_player_hands())
+        ))
+
     def is_user_a_participant(self, user_id_: str) -> bool:
         """
         Checks that the user is part of the game
@@ -225,6 +232,11 @@ class Game(Entity):
     def join_team(self, user_id_, team_id_):
         team = self.__get_user_team(user_id_)
 
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException(f"User {user_id_} tried to "
+                                    f"change team in a game that already "
+                                    f"ended.")
+
         if self.__get_last_partida():
             raise GameAlreadyStartedException(f"User {user_id_} tried to "
                                               f"change team after game start.")
@@ -245,10 +257,47 @@ class Game(Entity):
 
         self.__join_team(user_id_, team_id_)
 
+    def join_team_bot(self, user_id_: str, team_id_: int):
+        if user_id_ not in self.jogadores:
+            raise UserNotInGameException("User tried to join a bot in a "
+                                         "game he is not in")
+
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException("Tried to create a partida in an ended "
+                                    "game")
+
+        if self.__get_last_partida():
+            raise GameAlreadyStartedException(f"User tried to add "
+                                              f"bot to team after game start.")
+
+        if team_id_ not in [0, 1]:
+            raise InvalidTeamException(f"Team index {team_id_} "
+                                       f"out of range.")
+
+        if len(self.times[team_id_]) == 2:
+            raise FullTeamException(f"Team {team_id_} is already full")
+
+        computer_number = reduce(
+            lambda previous, nxt: (nxt.find("computer") != -1) + previous,
+            sum(self.times, []),
+            1
+        )
+        computer_name = 'computer' + str(computer_number)
+        print(computer_name)
+
+        if computer_name not in self.jogadores:
+            raise UserNotInGameException("No more bots to add to teams")
+
+        self.__join_team(computer_name, team_id_)
+
     def __join_team(self, user_id_, team_id_):
         self.times[team_id_].append(user_id_)
 
     def create_partida(self, user_id_):
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException("Tried to create a partida in an ended "
+                                    "game")
+
         if not self.is_user_a_participant(user_id_):
             raise UserNotInGameException(f"User {user_id_} not found in "
                                          f"game {self.id_}.")
@@ -257,14 +306,9 @@ class Game(Entity):
             raise PartidaOngoingException("Tried to create a partida in a "
                                           "game with a partida in progress")
 
-        if self.status == GameStatus.Encerrado:
-            raise GameOverException("Tried to create a partida in an ended "
-                                    "game")
-
         if self.status == GameStatus.AguardandoJogadores:
             raise GameNotReadyException("Still waiting for players")
 
-        print(self.times)
         if self.status == GameStatus.Pronto:
             if self.__all_human_players_are_in_teams():
                 self.__distribute_computers_on_teams()
@@ -280,8 +324,6 @@ class Game(Entity):
 
     def __distribute_computers_on_teams(self):
         for computer_player in self.__get_computer_players():
-            print(f"putting {computer_player} in a team")
-            print(f"Teams are {self.times}")
             if computer_player in self.__get_players_in_playing_order():
                 continue
             for time in range(TIMES):
@@ -373,3 +415,40 @@ class Game(Entity):
         if len(dict_to_return["partidas"]) >= 1:
             dict_to_return["partidas"] = dict_to_return["partidas"][:-1]
         return dict_to_return
+
+    def raise_game(self, user_id_):
+        if not self.is_user_a_participant(user_id_):
+            raise UserNotInGameException(f"User {user_id_} not found in "
+                                         f"game {self.id_}.")
+
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException(f"Game {self.id_} is already over.")
+
+        partida = self.__get_last_partida()
+
+        if not partida:
+            raise GameNotReadyException(f"User {user_id_} tried to raise on "
+                                        f"a game before start")
+
+        partida.raise_value(self.__get_user_index(user_id_),
+                            self.__get_user_team(user_id_))
+
+        self.partidas[-1] = dict(partida)
+
+    def fold_game(self, user_id_):
+        if not self.is_user_a_participant(user_id_):
+            raise UserNotInGameException(f"User {user_id_} not found in "
+                                         f"game {self.id_}.")
+
+        if self.status == GameStatus.Encerrado:
+            raise GameOverException(f"Game {self.id_} is already over.")
+
+        partida = self.__get_last_partida()
+
+        if not partida:
+            raise GameNotReadyException(f"User {user_id_} tried to raise on "
+                                        f"a game before start")
+
+        partida.fold(self.__get_user_team(user_id_))
+
+        self.partidas[-1] = dict(partida)

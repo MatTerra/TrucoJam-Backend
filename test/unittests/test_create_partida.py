@@ -45,7 +45,10 @@ class TestCreatePartida:
     def test_create_partida(
             game_with_players_and_hands
     ):
-        game_with_players_and_hands.times = [[id_, "computer1"], [TOKEN_INFO.get("sub"), "computer2"]]
+        game_with_players_and_hands.times = [[id_, "computer1"],
+                                             [TOKEN_INFO.get("sub"),
+                                              "computer2"]]
+
         game_with_players_and_hands.partidas = []
         game_with_players_and_hands.create_partida(id_)
         partida = Partida(**game_with_players_and_hands.partidas[0])
@@ -65,6 +68,7 @@ class TestCreatePartida:
         game_with_players_and_hands.times = [
             [player_id_, "computer2"], [id_, "computer1"]
         ]
+        print(game_with_players_and_hands.partidas[0])
         game_with_players_and_hands.partidas = []
         game_with_players_and_hands.create_partida(id_)
         partida = Partida(**game_with_players_and_hands.partidas[0])

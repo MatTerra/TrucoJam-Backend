@@ -22,8 +22,8 @@ TOKEN_INFO = {
     "sub": "23f2f1750af74f4b8d38683e4ed1b80b"
 }
 
-id_="ee81aa59cf1b41ea979e51f5170a128b"
-team_id_="0"
+id_ = "ee81aa59cf1b41ea979e51f5170a128b"
+team_id_ = "0"
 
 mao_id_ = {
     "jogador": id_,
@@ -75,8 +75,6 @@ def game():
     return Game(id_=id_, senha="123")
 
 
-__all__=["dao_mock", "success_response", "error_response",
-         "TOKEN_INFO", "game", "id_", "team_id_"]
 @fixture
 def game_with_players():
     game = Game()
@@ -97,6 +95,7 @@ def game_with_players_and_hands(partida_with_hands):
     game.times = [[id_, "computer1"], [TOKEN_INFO.get("sub"), "computer2"]]
     game.partidas = [dict(partida_with_hands)]
     return game
+
 
 @fixture()
 def partida_with_hands():

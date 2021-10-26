@@ -36,7 +36,7 @@ class TestPartidaAPIRead:
         assert res == (200, "Current partida retrieved",
                        {"partida": {
                            'maos': [mao_id_],
-                           'may_raise': True,
+                           'may_raise': [True, True],
                            'turno': 0,
                            'valor': 1,
                            'vencedor': None
@@ -99,7 +99,7 @@ class TestPartidaAPIPlay:
                                    }
                                ]
                            }],
-                           'may_raise': True,
+                           'may_raise': [True, True],
                            'turno': 1,
                            'valor': 1,
                            'vencedor': None
