@@ -105,11 +105,13 @@ class Game(Entity):
         partida.play(user_index, card_id_)
 
         vencedor = None
-        while self.__is_computer_next(partida) and not vencedor:
+        while self.__is_computer_next(partida) and not vencedor \
+                and partida.get_current_round() <= 3:
             partida.play(partida.turno, partida.get_current_round() - 1)
             vencedor = self.__check_partida_winner(partida)
             if vencedor:
                 break
+        vencedor = self.__check_partida_winner(partida)
 
         self.partidas[-1] = dict(partida)
 

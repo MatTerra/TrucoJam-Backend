@@ -174,4 +174,12 @@ class TestPlay():
                                      dao_mock)
 
         assert res[0] == 200
+        game_vieira.play(TOKEN_INFO.get("sub"), 1)
+        dao_mock.get.return_value = game_vieira
+        res = partida_api.play.__wrapped__(game_vieira.id_,
+                                           {"id_": 2},
+                                           TOKEN_INFO,
+                                           dao_mock)
+        assert res[0] == 200
+        print(res)
 

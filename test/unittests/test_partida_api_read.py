@@ -39,7 +39,8 @@ class TestPartidaAPIRead:
                            'may_raise': [True, True],
                            'turno': 0,
                            'valor': 1,
-                           'vencedor': None
+                           'vencedor': None,
+                           "mao_jogador": mao_id_
                        }})
 
     @staticmethod
