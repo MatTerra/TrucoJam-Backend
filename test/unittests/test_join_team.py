@@ -50,3 +50,13 @@ class TestJoinTeam():
         assert "computer1" in game_with_players.times[1]
         assert "computer2" not in game_with_players.times[0]
         assert game_with_players.status == GameStatus.AguardandoJogadores
+        assert len(game_with_players.jogadores) == 3
+        assert "computer2" not in game_with_players.jogadores
+
+        game_with_players.jogadores = [id_, TOKEN_INFO.get("sub"), "computer1",
+                                       "computer2"]
+        game_with_players.times = [["computer2"], []]
+        game_with_players.remove_team_bot(id_, 0)
+        assert game_with_players.jogadores == [id_, TOKEN_INFO.get("sub"),
+                                               "computer1"]
+        assert game_with_players.times == [[], []]

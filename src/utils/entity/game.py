@@ -326,6 +326,9 @@ class Game(Entity):
             for time in self.times
         ]
         computers = self.__get_computer_players()[:-1]
+        self.jogadores = [player for player in self.jogadores
+                          if not player.startswith("computer")]
+        self.jogadores.extend(computers)
         for computer in computers:
             for time in range(TIMES):
                 print(
