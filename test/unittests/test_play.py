@@ -5,6 +5,7 @@ from pytest import raises
 from test.unittests import *
 from utils.controller import game_api, partida_api
 from utils.entity.game import Game, GameStatus
+from utils.entity.partida import Partida
 from utils.exceptions.game_over_exception import GameOverException
 from utils.exceptions.not_user_turn_exception import NotUserTurnException
 from utils.exceptions.user_not_in_game_exception import UserNotInGameException
@@ -45,7 +46,6 @@ class TestPlay():
         print(res.turno)
         game_with_players_and_hands.play(id_, 1)
         res = game_with_players_and_hands.play(TOKEN_INFO.get("sub"), 1)
-
 
         assert res.vencedor == 1
 
@@ -146,7 +146,6 @@ class TestPlay():
     def test_play_without_partida_should_return_none(game_with_players):
         assert game_with_players.play(id_, 0) is None
 
-
     @staticmethod
     def test_play_with_mixed_order(game_with_players_and_hands):
         game_with_players_and_hands.partidas = []
@@ -169,9 +168,9 @@ class TestPlay():
     def test_play_card_1_in_vieira_game(game_vieira, dao_mock):
         dao_mock.get.return_value = game_vieira
         res = partida_api.play.__wrapped__(game_vieira.id_,
-                                     {"id_": 1},
-                                     TOKEN_INFO,
-                                     dao_mock)
+                                           {"id_": 1},
+                                           TOKEN_INFO,
+                                           dao_mock)
 
         assert res[0] == 200
         game_vieira.play(TOKEN_INFO.get("sub"), 1)
@@ -189,3 +188,106 @@ class TestPlay():
         assert partida_vieira2.get_round_winner(2) == 0
         assert partida_vieira2.get_round_winner(3) == 2
 
+    @staticmethod
+    def test_winner_failed(dao_mock):
+        game = Game()
+        game.join(TOKEN_INFO.get("sub"))
+
+        game.join("computer1")
+        game.join("computer2")
+        game.join("computer3")
+        game.times = [[TOKEN_INFO.get("sub"), "computer1"],
+                      ["computer2", "computer3"]]
+        maos = [
+            {
+                "cartas": [
+                    {
+                        "naipe": 0,
+                        "rodada": 1,
+                        "valor": 3
+                    },
+                    {
+                        "naipe": 0,
+                        "rodada": 2,
+                        "valor": 6
+                    },
+                    {
+                        "naipe": 2,
+                        "rodada": None,
+                        "valor": 2
+                    }
+                ],
+                "jogador": "nqG6zj27jyOAJdtj6ZJuByMbWa63"
+            },
+            {
+                "cartas": [
+                    {
+                        "naipe": 0,
+                        "rodada": 1,
+                        "valor": 7
+                    },
+                    {
+                        "naipe": 1,
+                        "rodada": 2,
+                        "valor": 7
+                    },
+                    {
+                        "naipe": 3,
+                        "rodada": None,
+                        "valor": 3
+                    }
+                ],
+                "jogador": "computer2"
+            },
+            {
+                "cartas": [
+                    {
+                        "naipe": 1,
+                        "rodada": 1,
+                        "valor": 5
+                    },
+                    {
+                        "naipe": 2,
+                        "rodada": 2,
+                        "valor": 4
+                    },
+                    {
+                        "naipe": 0,
+                        "rodada": None,
+                        "valor": 4
+                    }
+                ],
+                "jogador": "computer1"
+            },
+            {
+                "cartas": [
+                    {
+                        "naipe": 3,
+                        "rodada": 1,
+                        "valor": 7
+                    },
+                    {
+                        "naipe": 0,
+                        "rodada": 2,
+                        "valor": 2
+                    },
+                    {
+                        "naipe": 3,
+                        "rodada": 3,
+                        "valor": 6
+                    }
+                ],
+                "jogador": "computer3"
+            }
+        ]
+        partida = Partida(maos=maos, turno=0)
+        game.partidas = [dict(partida)]
+
+        dao_mock.get.return_value = game
+        res = partida_api.play.__wrapped__(game.id_,
+                                           {"id_": 2},
+                                           TOKEN_INFO,
+                                           dao_mock)
+
+        assert game.partidas[0]["vencedor"] is not None
+        assert len(game.partidas) == 2
