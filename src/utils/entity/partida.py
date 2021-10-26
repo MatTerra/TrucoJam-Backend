@@ -87,7 +87,7 @@ class Partida:
         return (self.turno + 1) % 4
 
     def get_round_winner(self, round):
-        round_cards = self.__get_round_cards(round)
+        round_cards = self.__get_round_cards(round+1)
 
         if len(round_cards) == 4:
             return round_cards.index(max(round_cards))

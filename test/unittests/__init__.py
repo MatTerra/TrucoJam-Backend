@@ -283,9 +283,97 @@ def partida_vieira():
 
     return Partida(maos=maos, turno=0)
 
+@fixture()
+def partida_vieira2():
+    maos = [
+        {
+            "jogador": TOKEN_INFO.get("sub"),
+            "cartas": [
+                {
+                    "naipe": 2,
+                    "valor": 6,
+                    "rodada": 1
+                },
+                {
+                    "naipe": 3,
+                    "valor": 7,
+                    "rodada": 2
+                },
+                {
+                    "naipe": 3,
+                    "valor": 4,
+                    "rodada": 3
+                }
+            ]
+        },
+        {
+            "jogador": "computer2",
+            "cartas": [
+                {
+                    "naipe": 0,
+                    "valor": 7,
+                    "rodada": 1
+                },
+                {
+                    "naipe": 0,
+                    "valor": 4,
+                    "rodada": 2
+                },
+                {
+                    "naipe": 0,
+                    "valor": 2,
+                    "rodada": 3
+                }
+            ]
+        },
+        {
+            "jogador": "computer1",
+            "cartas": [
+                {
+                    "naipe": 2,
+                    "valor": 4,
+                    "rodada": 1
+                },
+                {
+                    "naipe": 1,
+                    "valor": 7,
+                    "rodada": 2
+                },
+                {
+                    "naipe": 2,
+                    "valor": 7,
+                    "rodada": 3
+                }
+            ]
+        },
+        {
+            "jogador": "computer3",
+            "cartas": [
+                {
+                    "naipe": 0,
+                    "valor": 3,
+                    "rodada": 1
+                },
+                {
+                    "naipe": 2,
+                    "valor": 1,
+                    "rodada": 2
+                },
+                {
+                    "naipe": 3,
+                    "valor": 6,
+                    "rodada": 3
+                }
+            ]
+        }
+    ]
+
+    return Partida(maos=maos, turno=2)
+
 
 __all__ = ["dao_mock", "success_response", "error_response",
            "TOKEN_INFO", "game", "id_", "game_with_players",
            "game_with_players_and_hands", "mao_id_",
            "partida_with_hands", "game_vieira", "partida_vieira",
-           "success_response_partida", "error_response_partida"]
+           "success_response_partida", "error_response_partida",
+           "partida_vieira2"]
