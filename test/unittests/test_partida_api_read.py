@@ -80,6 +80,7 @@ class TestPartidaAPIPlay:
         dao_mock.get.assert_called_with(id_=id_)
         assert res == (200, "Card played",
                        {"partida": {
+                           "mao_jogador": mao_id_,
                            'maos': [{
                                "jogador": id_,
                                "cartas": [

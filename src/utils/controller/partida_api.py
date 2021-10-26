@@ -69,7 +69,11 @@ def play(id_: str, card: dict, token_info: dict = None, dao: GameDAO = None):
 
     dao.update(game)
 
-    return success_response(200, "Card played", {"partida": dict(partida)})
+    return success_response(200, "Card played",
+                            {"partida": {
+                                **dict(partida),
+                                "mao_jogador": game.get_player_hand(user_id_)}
+                            })
 
 
 @use_dao(GameDAO, "Unable to raise partida")
