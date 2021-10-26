@@ -419,7 +419,7 @@ paths:
                     type: string
   /{id_}/bot-team/{team_id_}:
     put:
-      operationId: utils.controller.game_api.join_team
+      operationId: utils.controller.game_api.join_team_bot
       security:
         - jwt: [ 'secret' ]
       tags:
@@ -439,6 +439,58 @@ paths:
       summary: "Join bot in Team in Game"
       description: |
         "Join a bot to a team in a game."
+      responses:
+        200:
+          description: "Game"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  entity:
+                    type: object
+        401:
+          description: "Unauthorized due to invalid or not present token"
+        500:
+          description: "An error ocurred"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+              data:
+                type: object
+                properties:
+                  error:
+                    type: string
+    delete:
+      operationId: utils.controller.game_api.remove_team_bot
+      security:
+        - jwt: [ 'secret' ]
+      tags:
+        - "Game"
+      parameters:
+        - name: id_
+          in: path
+          type: string
+          required: true
+          description: "Id of the game"
+        - name: team_id_
+          in: path
+          type: integer
+          required: true
+          enum: [ 0, 1 ]
+          description: "Team to remove bot in game"
+      summary: "Remove bot in Team in Game"
+      description: |
+        "Remove a bot in a team in a game."
       responses:
         200:
           description: "Game"
