@@ -232,12 +232,16 @@ class Game(Entity):
             self.status = GameStatus.Pronto
 
     def join_team(self, user_id_, team_id_):
-        team = self.__get_user_team(user_id_)
-
         if self.status == GameStatus.Encerrado:
             raise GameOverException(f"User {user_id_} tried to "
                                     f"change team in a game that already "
                                     f"ended.")
+
+        if not self.is_user_a_participant(user_id_):
+            raise UserNotInGameException(f"User {user_id_} not found in "
+                                         f"game {self.id_}.")
+
+        team = self.__get_user_team(user_id_)
 
         if self.__get_last_partida():
             raise GameAlreadyStartedException(f"User {user_id_} tried to "
@@ -260,7 +264,7 @@ class Game(Entity):
         self.__join_team(user_id_, team_id_)
 
     def join_team_bot(self, user_id_: str, team_id_: int):
-        if user_id_ not in self.jogadores:
+        if not self.is_user_a_participant(user_id_):
             raise UserNotInGameException("User tried to join a bot in a "
                                          "game he is not in")
 
