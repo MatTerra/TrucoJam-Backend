@@ -52,34 +52,6 @@ paths:
           type: integer
           required: false
           description: "Amount of game to skip"
-        - name: id_
-          in: query
-          type: string
-          required: false
-        - name: creation_datetime
-          in: query
-          type: string
-          required: false
-        - name: last_modified_datetime
-          in: query
-          type: string
-          required: false
-        - name: pontuacao
-          in: query
-          type: string
-          required: false
-        - name: senha
-          in: query
-          type: string
-          required: false
-        - name: times
-          in: query
-          type: string
-          required: false
-        - name: partidas
-          in: query
-          type: string
-          required: false
       summary: "Lists all Game available"
       description: |
         "Lists all Game in the database. May be filtered by all fields."
@@ -629,7 +601,7 @@ paths:
 
   /{id_}/partida/raise:
     put:
-      operationId: utils.controller.partida_api.raise_
+      operationId: utils.controller.partida_api.raise_request
       security:
         - jwt: ['secret']
       tags:

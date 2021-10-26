@@ -53,18 +53,6 @@ def read(length: int = 20, offset: int = 0,
     """
     filters = dict()
 
-    # entity_attributes = [field.name for field in fields(Game)]
-
-    # for key, value in kwargs.items():
-    #     if key not in entity_attributes:
-    #         continue
-    #
-    #     filters[key] = value.split(',', 1) \
-    #         if str(value).count(',') >= 1 \
-    #            and str(value).split(',')[0] \
-    #            in dao.ALLOWED_COMPARATORS \
-    #         else value
-
     total, results = dao.get_all(length=length, offset=offset,
                                  filters=filters if filters else None)
     return success_response(message="List of game",
@@ -171,7 +159,12 @@ def start_game(id_: str, dao: MongoDAO, token_info: dict):
     })
 
 
-def game_doesnt_exist_response(id_):
+def game_doesnt_exist_response(id_: str):
+    """
+    Default response for non existent game
+    :param id_: The ID of the Game requested
+    :return:
+    """
     return error_response(404, "This game doesn't exist", {"id_": id_})
 
 
@@ -206,8 +199,17 @@ def join(id_: str, password: dict = None, token_info: dict = None,
 
 @use_dao(GameDAO, "Unable to join team in game")
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
-def join_team(id_: str, team_id_: str, dao: GameDAO = None,
+def join_team(id_: str, team_id_: int, dao: GameDAO = None,
               token_info: dict = None):
+    """
+    Join a team. This adds the user to the team if he is in the game
+
+    :param dao: Database connection
+    :param id_: ID of the game to join
+    :param team_id_: The id_ of the team to join
+    :param token_info: User token data
+    :return: Success if the join was successful and false otherwise.
+    """
     game: Game = dao.get(id_=id_)
     user_id_ = token_info.get("sub")
 
@@ -226,6 +228,15 @@ def join_team(id_: str, team_id_: str, dao: GameDAO = None,
 @validate_jwt_claims(claims=TRUCOJAM_BASE_CLAIMS, add_token_info=True)
 def join_team_bot(id_: str, team_id_: int, dao: GameDAO = None,
                   token_info: dict = None):
+    """
+    Adds a bot to a team.
+
+    :param dao: Database connection
+    :param id_: ID of the game to join
+    :param team_id_: ID of the team to add a bot to
+    :param token_info: User token data
+    :return: Success if the join was successful and false otherwise.
+    """
     game: Game = dao.get(id_=id_)
     user_id_ = token_info.get("sub")
 
