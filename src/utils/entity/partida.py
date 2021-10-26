@@ -75,8 +75,7 @@ class Partida:
         return max(
             [self.__get_user_card_round(user_id_, card)
              for card in range(3)
-             if
-             self.__get_user_card_round(user_id_, card)],
+             if self.__get_user_card_round(user_id_, card)],
             default=0)
 
     def __get_next_turn(self, round):

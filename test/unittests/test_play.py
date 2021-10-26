@@ -3,6 +3,7 @@ from copy import deepcopy
 from pytest import raises
 
 from test.unittests import *
+from utils.controller import game_api, partida_api
 from utils.entity.game import Game, GameStatus
 from utils.exceptions.game_over_exception import GameOverException
 from utils.exceptions.not_user_turn_exception import NotUserTurnException
@@ -163,4 +164,14 @@ class TestPlay():
         res = game_with_players_and_hands.play(player_id_, 0)
         assert len(res.maos) == 1
         assert before_play == res
+
+    @staticmethod
+    def test_play_card_1_in_vieira_game(game_vieira, dao_mock):
+        dao_mock.get.return_value = game_vieira
+        res = partida_api.play.__wrapped__(game_vieira.id_,
+                                     {"id_": 1},
+                                     TOKEN_INFO,
+                                     dao_mock)
+
+        assert res[0] == 200
 

@@ -331,9 +331,6 @@ class Game(Entity):
         self.jogadores.extend(computers)
         for computer in computers:
             for time in range(TIMES):
-                print(
-                    f"{computer} in {time}: "
-                    f"{self.team_should_have_a_bot(time, old_teams, team_id_)}")
                 if self.team_should_have_a_bot(time, old_teams, team_id_):
                     self.__join_team(computer, time)
                     continue
@@ -413,6 +410,10 @@ class Game(Entity):
             for jogador in self.__get_players_in_playing_order()]
         return maos
 
+    def get_player_hand(self, user_id_):
+        return [mao for mao in self.__get_last_partida().maos
+                if mao.get("jogador") == user_id_][0]
+
     def get_current_partida(self, user_id_: str) -> Optional[Partida]:
         """
         Returns the current partida correctly formatted for the player, that
@@ -434,7 +435,7 @@ class Game(Entity):
         if len(self.partidas) == 0:
             return None
 
-        partida = self.__get_last_partida()
+        partida = deepcopy(self.__get_last_partida())
 
         if partida:
             Game.__filter_hands(partida, user_id_)

@@ -7,7 +7,7 @@ from unittest.mock import Mock
 from pytest import fixture
 
 from utils.entity.card import Suit, Value
-from utils.entity.game import Game
+from utils.entity.game import Game, GameStatus
 from utils.entity.partida import Partida
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -65,6 +65,21 @@ def success_response(mocker):
 @fixture(autouse=True)
 def error_response(mocker):
     mock = mocker.patch("utils.controller.game_api.error_response")
+    mock.side_effect = lambda status_code=500, message="Error", data={}: \
+        (status_code, message, data)
+    return mock
+
+@fixture(autouse=True)
+def success_response_partida(mocker):
+    mock = mocker.patch("utils.controller.partida_api.success_response")
+    mock.side_effect = lambda status_code=200, message="OK", data={}: \
+        (status_code, message, data)
+    return mock
+
+
+@fixture(autouse=True)
+def error_response_partida(mocker):
+    mock = mocker.patch("utils.controller.partida_api.error_response")
     mock.side_effect = lambda status_code=500, message="Error", data={}: \
         (status_code, message, data)
     return mock
@@ -165,8 +180,112 @@ def partida_with_hands():
 
     return Partida(maos=maos)
 
+@fixture()
+def game_vieira(partida_vieira):
+    game = Game()
+    game.join(TOKEN_INFO.get("sub"))
+    game.join("computer1")
+    game.join("computer2")
+    game.join("computer3")
+    game.join_team(TOKEN_INFO.get("sub"), 0)
+    game.join_team("computer1", 0)
+    game.join_team("computer2", 1)
+    game.join_team("computer3", 1)
+    game.status = GameStatus.Jogando
+    game.partidas = [dict(partida_vieira)]
+    return game
+
+
+@fixture()
+def partida_vieira():
+    maos = [
+        {
+            "jogador": TOKEN_INFO.get("sub"),
+            "cartas": [
+                {
+                    "naipe": 1,
+                    "valor": 5,
+                    "rodada": 1
+                },
+                {
+                    "naipe": 0,
+                    "valor": 1,
+                    "rodada": None
+                },
+                {
+                    "naipe": 3,
+                    "valor": 7,
+                    "rodada": None
+                }
+            ]
+        },
+        {
+            "jogador": "computer2",
+            "cartas": [
+                {
+                    "naipe": 1,
+                    "valor": 1,
+                    "rodada": 1
+                },
+                {
+                    "naipe": 0,
+                    "valor": 1,
+                    "rodada": None
+                },
+                {
+                    "naipe": 0,
+                    "valor": 2,
+                    "rodada": None
+                }
+            ]
+        },
+        {
+            "jogador": "computer1",
+            "cartas": [
+                {
+                    "naipe": 3,
+                    "valor": 6,
+                    "rodada": 1
+                },
+                {
+                    "naipe": 3,
+                    "valor": 3,
+                    "rodada": 2
+                },
+                {
+                    "naipe": 1,
+                    "valor": 1,
+                    "rodada": None
+                }
+            ]
+        },
+        {
+            "jogador": "computer3",
+            "cartas": [
+                {
+                    "naipe": 0,
+                    "valor": 4,
+                    "rodada": 1
+                },
+                {
+                    "naipe": 2,
+                    "valor": 2,
+                    "rodada": 2
+                },
+                {
+                    "naipe": 4,
+                    "valor": 4,
+                    "rodada": None
+                }
+            ]
+        }
+    ]
+
+    return Partida(maos=maos, turno=0)
+
 
 __all__ = ["dao_mock", "success_response", "error_response",
            "TOKEN_INFO", "game", "id_", "game_with_players",
            "game_with_players_and_hands", "mao_id_",
-           "partida_with_hands"]
+           "partida_with_hands", "game_vieira", "partida_vieira",
+           "success_response_partida", "error_response_partida"]
