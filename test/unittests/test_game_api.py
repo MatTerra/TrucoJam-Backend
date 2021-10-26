@@ -6,13 +6,7 @@ from pytest import fixture, raises
 
 from utils.controller import game_api
 from utils.entity.game import Game
-
-TOKEN_INFO = {
-    "iat": datetime.now().timestamp(),
-    "exp": (datetime.now() + timedelta(1.0)).timestamp(),
-    "iss": "https://securetoken.google.com/trucojam",
-    "aud": "trucojam"
-}
+from test.unittests import *
 
 
 def raise_exception(exc_type: Type[Exception] = Exception):
@@ -45,7 +39,7 @@ class TestGameAPI:
             dao=dao_mock,
             token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 1, "results": [
-            dict(game)
+            game.game_to_return()
         ]})
         dao_mock.get_all.assert_called_with(length=20, offset=0, filters=None)
 
@@ -55,7 +49,7 @@ class TestGameAPI:
         res = game_api.read.__wrapped__(
             length=2, dao=dao_mock, token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 1, "results": [
-            dict(game)
+            game.game_to_return()
         ]})
         dao_mock.get_all.assert_called_with(length=2, offset=0, filters=None)
 
@@ -66,51 +60,60 @@ class TestGameAPI:
             offset=2, dao=dao_mock,
             token_info=TOKEN_INFO)
         assert res == (200, "List of game", {"total": 3, "results": [
-            dict(game)
+            game.game_to_return()
         ]})
         dao_mock.get_all.assert_called_with(length=20, offset=2, filters=None)
 
     @staticmethod
     def test_read_one_found(dao_mock: Mock, game: Game):
         dao_mock.get.return_value = game
+        game.join(TOKEN_INFO["sub"], game.senha)
 
-        res = game_api.read_one.__wrapped__(id_=game.id_, dao=dao_mock)
+        res = game_api.read_one.__wrapped__(id_=game.id_, dao=dao_mock,
+                                            token_info=TOKEN_INFO)
 
         dao_mock.get.assert_called_with(id_=game.id_)
-        assert res == (200, "Game retrieved", {"Game": dict(game)})
+        assert res == (200, "Game retrieved", {"Game": game.game_to_return()})
+
+    @staticmethod
+    def test_read_one_found_player_not_in_game(dao_mock: Mock, game: Game):
+        dao_mock.get.return_value = game
+
+        res = game_api.read_one.__wrapped__(id_=game.id_, dao=dao_mock,
+                                            token_info=TOKEN_INFO)
+
+        dao_mock.get.assert_called_with(id_=game.id_)
+        assert res == (403, "Player not in game", {"id_": game.id_})
 
     @staticmethod
     def test_read_one_not_found(dao_mock: Mock, game: Game):
         dao_mock.get.return_value = None
 
-        res = game_api.read_one.__wrapped__(id_=game.id_, dao=dao_mock)
+        res = game_api.read_one.__wrapped__(id_=game.id_, dao=dao_mock,
+                                            token_info=TOKEN_INFO)
 
         dao_mock.get.assert_called_with(id_=game.id_)
         assert res == (404, "Game not found in database", {"id_": game.id_})
 
     @staticmethod
     def test_create(dao_mock: Mock, game: Game):
-        res = game_api.create.__wrapped__(entity=dict(game), dao=dao_mock)
+        res = game_api.create.__wrapped__({}, dao_mock,
+                                          token_info=TOKEN_INFO)
 
-        dao_mock.create.assert_called_with(entity=game)
-        assert res == (201, "Game created", {"Game": dict(game)})
-
-    @staticmethod
-    @fixture
-    def dao_mock():
-        dao_mock = Mock()
-        dao_mock.get_all.return_value = 0, []
-        return dao_mock
+        print(res)
+        assert TOKEN_INFO["sub"] in res[2]["Game"]["jogadores"]
+        dao_mock.create.assert_called()
+        assert res[0] == 201
+        assert res[1] == "Game created"
 
     @staticmethod
-    @fixture
-    def game():
-        return Game()
+    def test_join_team(dao_mock: Mock, game_with_players):
+        dao_mock.get.return_value = game_with_players
+        res = game_api.join_team.__wrapped__(id_, 1, dao_mock,
+                                             token_info=TOKEN_INFO)
 
-    @staticmethod
-    @fixture(autouse=True)
-    def success_response(mocker):
-        mock = mocker.patch("utils.controller.game_api.success_response")
-        mock.side_effect = lambda status_code=200, message="OK", data={}: \
-            (status_code, message, data)
-        return mock
+        print(res)
+        assert TOKEN_INFO["sub"] in res[2]["Game"]["times"][1]
+        dao_mock.update.assert_called()
+        assert res[0] == 200
+        assert res[1] == "User joined team"
