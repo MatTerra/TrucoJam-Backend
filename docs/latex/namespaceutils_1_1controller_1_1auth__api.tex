@@ -1,0 +1,28 @@
+\hypertarget{namespaceutils_1_1controller_1_1auth__api}{}\doxysection{utils.\+controller.\+auth\+\_\+api Namespace Reference}
+\label{namespaceutils_1_1controller_1_1auth__api}\index{utils.controller.auth\_api@{utils.controller.auth\_api}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Response \mbox{\hyperlink{namespaceutils_1_1controller_1_1auth__api_ad551117a5b768203871286c4deb6f03c}{auth}} (str name)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Anonymous authentication module
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{namespaceutils_1_1controller_1_1auth__api_ad551117a5b768203871286c4deb6f03c}\label{namespaceutils_1_1controller_1_1auth__api_ad551117a5b768203871286c4deb6f03c}} 
+\index{utils.controller.auth\_api@{utils.controller.auth\_api}!auth@{auth}}
+\index{auth@{auth}!utils.controller.auth\_api@{utils.controller.auth\_api}}
+\doxysubsubsection{\texorpdfstring{auth()}{auth()}}
+{\footnotesize\ttfamily  Response utils.\+controller.\+auth\+\_\+api.\+auth (\begin{DoxyParamCaption}\item[{str}]{name }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Generates token for anonymous player. Accepts only name and generates \
+a random ID for player identification. The token is valid for a day.
+
+:param name: Anonymous player nickname
+:return: Success response with valid signed JWT token.
+\end{DoxyVerb}
+ 

@@ -1,0 +1,165 @@
+\hypertarget{namespaceutils_1_1controller_1_1game__api}{}\doxysection{utils.\+controller.\+game\+\_\+api Namespace Reference}
+\label{namespaceutils_1_1controller_1_1game__api}\index{utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_a4ab5607095ee52f01943e89a6d6c2765}{check\+\_\+team}} (user\+\_\+id\+\_\+, list time\+\_\+)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_aab277cb3d1f765f68b396fa8cbe57a5b}{user\+\_\+team}} (user\+\_\+id\+\_\+, times)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_a939186423b76f8ae42ca685f09d95fc0}{probe}} (Mongo\+DAO dao=None)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_afdd8383cfd507876d0465af36a06d5e0}{read}} (int length=20, int offset=0, Mongo\+DAO dao=None, dict token\+\_\+info=None, $\ast$$\ast$kwargs)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_a2dc3e8224564a4f9514ce2772f3c8ea5}{read\+\_\+one}} (str id\+\_\+, Mongo\+DAO dao=None, dict token\+\_\+info=None)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_a65e0861467a0837821248b5ede5b1ed3}{create}} (dict entity, Mongo\+DAO dao=None, dict token\+\_\+info=None)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_a6717385889b8ad9b19f5bcfc779b5393}{delete}} (str id\+\_\+, Mongo\+DAO dao)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_a1095ccbd4b636cca94e2cf15f64188c0}{start\+\_\+game}} (str id\+\_\+, Mongo\+DAO dao, dict token\+\_\+info)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_a9a54f48d9483e34f3766587113e94a6d}{game\+\_\+doesnt\+\_\+exist\+\_\+response}} (id\+\_\+)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_ae64acb2f18575dbdfb99e7b7da925e84}{join}} (str id\+\_\+, dict password=None, dict token\+\_\+info=None, \mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} dao=None)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_ab9a5ac87610af1251804e0d2caf6abc2}{join\+\_\+team}} (str id\+\_\+, str team\+\_\+id\+\_\+, \mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} dao=None, dict token\+\_\+info=None)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_ab551aaee6aea1bc08c7571a98eada5d0}{join\+\_\+team\+\_\+bot}} (str id\+\_\+, int team\+\_\+id\+\_\+, \mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} dao=None, dict token\+\_\+info=None)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1game__api_a9377ce2ae83800b8a3e0e3af645aa402}{remove\+\_\+team\+\_\+bot}} (str id\+\_\+, int team\+\_\+id\+\_\+, \mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} dao=None, dict token\+\_\+info=None)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Truco JAM Game backend controller
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_a4ab5607095ee52f01943e89a6d6c2765}\label{namespaceutils_1_1controller_1_1game__api_a4ab5607095ee52f01943e89a6d6c2765}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!check\_team@{check\_team}}
+\index{check\_team@{check\_team}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{check\_team()}{check\_team()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+check\+\_\+team (\begin{DoxyParamCaption}\item[{}]{user\+\_\+id\+\_\+,  }\item[{list}]{time\+\_\+ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_a65e0861467a0837821248b5ede5b1ed3}\label{namespaceutils_1_1controller_1_1game__api_a65e0861467a0837821248b5ede5b1ed3}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!create@{create}}
+\index{create@{create}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+create (\begin{DoxyParamCaption}\item[{dict}]{entity,  }\item[{Mongo\+DAO }]{dao = {\ttfamily None},  }\item[{dict }]{token\+\_\+info = {\ttfamily None} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Creates a new game in the database
+
+:param entity: The fields of the game
+:param dao: The DAO to use to communicate with the database
+:return:
+\end{DoxyVerb}
+ \mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_a6717385889b8ad9b19f5bcfc779b5393}\label{namespaceutils_1_1controller_1_1game__api_a6717385889b8ad9b19f5bcfc779b5393}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!delete@{delete}}
+\index{delete@{delete}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{delete()}{delete()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+delete (\begin{DoxyParamCaption}\item[{str}]{id\+\_\+,  }\item[{Mongo\+DAO}]{dao }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Endpoint to delete a game
+
+:param id_: The ID of the game to delete
+:param dao: The DAO to use to communicate with the database
+:return:
+\end{DoxyVerb}
+ \mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_a9a54f48d9483e34f3766587113e94a6d}\label{namespaceutils_1_1controller_1_1game__api_a9a54f48d9483e34f3766587113e94a6d}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!game\_doesnt\_exist\_response@{game\_doesnt\_exist\_response}}
+\index{game\_doesnt\_exist\_response@{game\_doesnt\_exist\_response}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{game\_doesnt\_exist\_response()}{game\_doesnt\_exist\_response()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+game\+\_\+doesnt\+\_\+exist\+\_\+response (\begin{DoxyParamCaption}\item[{}]{id\+\_\+ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_ae64acb2f18575dbdfb99e7b7da925e84}\label{namespaceutils_1_1controller_1_1game__api_ae64acb2f18575dbdfb99e7b7da925e84}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!join@{join}}
+\index{join@{join}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{join()}{join()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+join (\begin{DoxyParamCaption}\item[{str}]{id\+\_\+,  }\item[{dict }]{password = {\ttfamily None},  }\item[{dict }]{token\+\_\+info = {\ttfamily None},  }\item[{\mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} }]{dao = {\ttfamily None} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Join a game. This checks the password informed and adds the user \
+    to the game if correct.
+
+:param dao: Database connection
+:param id_: ID of the game to join
+:param password: Dict with the password to join the game
+:param token_info: User token data
+:return: Success if the join was successful and false otherwise.
+\end{DoxyVerb}
+ \mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_ab9a5ac87610af1251804e0d2caf6abc2}\label{namespaceutils_1_1controller_1_1game__api_ab9a5ac87610af1251804e0d2caf6abc2}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!join\_team@{join\_team}}
+\index{join\_team@{join\_team}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{join\_team()}{join\_team()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+join\+\_\+team (\begin{DoxyParamCaption}\item[{str}]{id\+\_\+,  }\item[{str}]{team\+\_\+id\+\_\+,  }\item[{\mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} }]{dao = {\ttfamily None},  }\item[{dict }]{token\+\_\+info = {\ttfamily None} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_ab551aaee6aea1bc08c7571a98eada5d0}\label{namespaceutils_1_1controller_1_1game__api_ab551aaee6aea1bc08c7571a98eada5d0}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!join\_team\_bot@{join\_team\_bot}}
+\index{join\_team\_bot@{join\_team\_bot}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{join\_team\_bot()}{join\_team\_bot()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+join\+\_\+team\+\_\+bot (\begin{DoxyParamCaption}\item[{str}]{id\+\_\+,  }\item[{int}]{team\+\_\+id\+\_\+,  }\item[{\mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} }]{dao = {\ttfamily None},  }\item[{dict }]{token\+\_\+info = {\ttfamily None} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_a939186423b76f8ae42ca685f09d95fc0}\label{namespaceutils_1_1controller_1_1game__api_a939186423b76f8ae42ca685f09d95fc0}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!probe@{probe}}
+\index{probe@{probe}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{probe()}{probe()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+probe (\begin{DoxyParamCaption}\item[{Mongo\+DAO }]{dao = {\ttfamily None} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Health Check handler
+
+:param dao: The DAO to use to communicate with the database
+:return: Success Response if ok. Error Response otherwise.
+\end{DoxyVerb}
+ \mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_afdd8383cfd507876d0465af36a06d5e0}\label{namespaceutils_1_1controller_1_1game__api_afdd8383cfd507876d0465af36a06d5e0}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!read@{read}}
+\index{read@{read}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+read (\begin{DoxyParamCaption}\item[{int }]{length = {\ttfamily 20},  }\item[{int }]{offset = {\ttfamily 0},  }\item[{Mongo\+DAO }]{dao = {\ttfamily None},  }\item[{dict }]{token\+\_\+info = {\ttfamily None},  }\item[{$\ast$$\ast$}]{kwargs }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Lists all Games in the database
+
+:param length: Amount of games to select
+:param offset: Games to skip while selecting
+:param dao: The DAO to use to communicate with the database
+:param kwargs: Filters to apply to Game selection
+:return:
+\end{DoxyVerb}
+ \mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_a2dc3e8224564a4f9514ce2772f3c8ea5}\label{namespaceutils_1_1controller_1_1game__api_a2dc3e8224564a4f9514ce2772f3c8ea5}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!read\_one@{read\_one}}
+\index{read\_one@{read\_one}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{read\_one()}{read\_one()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+read\+\_\+one (\begin{DoxyParamCaption}\item[{str}]{id\+\_\+,  }\item[{Mongo\+DAO }]{dao = {\ttfamily None},  }\item[{dict }]{token\+\_\+info = {\ttfamily None} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Recovers a single game from the database
+
+:param token_info:
+:param id_: ID of the game to recover
+:param dao: The DAO to use to communicate with the database
+:return:
+\end{DoxyVerb}
+ \mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_a9377ce2ae83800b8a3e0e3af645aa402}\label{namespaceutils_1_1controller_1_1game__api_a9377ce2ae83800b8a3e0e3af645aa402}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!remove\_team\_bot@{remove\_team\_bot}}
+\index{remove\_team\_bot@{remove\_team\_bot}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{remove\_team\_bot()}{remove\_team\_bot()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+remove\+\_\+team\+\_\+bot (\begin{DoxyParamCaption}\item[{str}]{id\+\_\+,  }\item[{int}]{team\+\_\+id\+\_\+,  }\item[{\mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} }]{dao = {\ttfamily None},  }\item[{dict }]{token\+\_\+info = {\ttfamily None} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_a1095ccbd4b636cca94e2cf15f64188c0}\label{namespaceutils_1_1controller_1_1game__api_a1095ccbd4b636cca94e2cf15f64188c0}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!start\_game@{start\_game}}
+\index{start\_game@{start\_game}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{start\_game()}{start\_game()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+start\+\_\+game (\begin{DoxyParamCaption}\item[{str}]{id\+\_\+,  }\item[{Mongo\+DAO}]{dao,  }\item[{dict}]{token\+\_\+info }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Endpoint to create a new partida in a game
+
+:param token_info:
+:param id_: ID of the game in which to create the partida
+:param dao: The DAO to use to communicate with the database
+:return:
+\end{DoxyVerb}
+ \mbox{\Hypertarget{namespaceutils_1_1controller_1_1game__api_aab277cb3d1f765f68b396fa8cbe57a5b}\label{namespaceutils_1_1controller_1_1game__api_aab277cb3d1f765f68b396fa8cbe57a5b}} 
+\index{utils.controller.game\_api@{utils.controller.game\_api}!user\_team@{user\_team}}
+\index{user\_team@{user\_team}!utils.controller.game\_api@{utils.controller.game\_api}}
+\doxysubsubsection{\texorpdfstring{user\_team()}{user\_team()}}
+{\footnotesize\ttfamily def utils.\+controller.\+game\+\_\+api.\+user\+\_\+team (\begin{DoxyParamCaption}\item[{}]{user\+\_\+id\+\_\+,  }\item[{}]{times }\end{DoxyParamCaption})}
+

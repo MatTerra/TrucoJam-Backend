@@ -1,0 +1,116 @@
+\hypertarget{namespaceserver}{}\doxysection{server Namespace Reference}
+\label{namespaceserver}\index{server@{server}}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{namespaceserver_a43e48d45560e05a17f4716d8b28aa82a}{debug}} = environ.\+get(\textquotesingle{}\mbox{\hyperlink{namespaceserver_a4f8abe5e41727de7cb88d5f2a826cdcb}{DEBUG}}\textquotesingle{}) or \textquotesingle{}0\textquotesingle{}
+\item 
+\mbox{\hyperlink{namespaceserver_a4f8abe5e41727de7cb88d5f2a826cdcb}{DEBUG}}
+\item 
+string \mbox{\hyperlink{namespaceserver_a76403fb9ac8076f3d83403c53d19bfed}{APIS}} = environ.\+get(\textquotesingle{}APIS\textquotesingle{}) or \textquotesingle{}\textquotesingle{}
+\item 
+\mbox{\hyperlink{namespaceserver_ad81539608721e4b8ffad6e7bb45dd34b}{app}} = connexion.\+App(\+\_\+\+\_\+name\+\_\+\+\_\+, specification\+\_\+dir=\char`\"{}.\char`\"{})
+\item 
+\mbox{\hyperlink{namespaceserver_a97beaf52d165c36b96255c1d4f247308}{r}}
+\item 
+\mbox{\hyperlink{namespaceserver_a3d17d8300ea243d03e9809c4db9049a2}{certs}} = r.\+json()
+\item 
+\mbox{\hyperlink{namespaceserver_a2986ea597257873960c5dbadd835ceb5}{cert\+\_\+public\+\_\+key}}
+\item 
+\mbox{\hyperlink{namespaceserver_a344d5f3d6f899cbece6c7d1944bc4899}{encoding}}
+\item 
+\mbox{\hyperlink{namespaceserver_addb76dcb1b81da9cf62eb9849b07211a}{format}}
+\item 
+\mbox{\hyperlink{namespaceserver_a0024bd723af2e8fbdfbbeb569770a1d5}{JWT\+\_\+\+SECRET}}
+\item 
+\mbox{\hyperlink{namespaceserver_ae0362f7d7e03199b2fb92f705b5efd32}{port}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Server configuration for the backend of Truco JAM
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{namespaceserver_a76403fb9ac8076f3d83403c53d19bfed}\label{namespaceserver_a76403fb9ac8076f3d83403c53d19bfed}} 
+\index{server@{server}!APIS@{APIS}}
+\index{APIS@{APIS}!server@{server}}
+\doxysubsubsection{\texorpdfstring{APIS}{APIS}}
+{\footnotesize\ttfamily list server.\+APIS = environ.\+get(\textquotesingle{}APIS\textquotesingle{}) or \textquotesingle{}\textquotesingle{}}
+
+\mbox{\Hypertarget{namespaceserver_ad81539608721e4b8ffad6e7bb45dd34b}\label{namespaceserver_ad81539608721e4b8ffad6e7bb45dd34b}} 
+\index{server@{server}!app@{app}}
+\index{app@{app}!server@{server}}
+\doxysubsubsection{\texorpdfstring{app}{app}}
+{\footnotesize\ttfamily server.\+app = connexion.\+App(\+\_\+\+\_\+name\+\_\+\+\_\+, specification\+\_\+dir=\char`\"{}.\char`\"{})}
+
+\mbox{\Hypertarget{namespaceserver_a2986ea597257873960c5dbadd835ceb5}\label{namespaceserver_a2986ea597257873960c5dbadd835ceb5}} 
+\index{server@{server}!cert\_public\_key@{cert\_public\_key}}
+\index{cert\_public\_key@{cert\_public\_key}!server@{server}}
+\doxysubsubsection{\texorpdfstring{cert\_public\_key}{cert\_public\_key}}
+{\footnotesize\ttfamily server.\+cert\+\_\+public\+\_\+key}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 =  load\_pem\_x509\_certificate(}
+\DoxyCodeLine{2             certs[cert\_id].encode(\textcolor{stringliteral}{"{}utf8"{}})}
+\DoxyCodeLine{3         ).public\_key()}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{namespaceserver_a3d17d8300ea243d03e9809c4db9049a2}\label{namespaceserver_a3d17d8300ea243d03e9809c4db9049a2}} 
+\index{server@{server}!certs@{certs}}
+\index{certs@{certs}!server@{server}}
+\doxysubsubsection{\texorpdfstring{certs}{certs}}
+{\footnotesize\ttfamily server.\+certs = r.\+json()}
+
+\mbox{\Hypertarget{namespaceserver_a43e48d45560e05a17f4716d8b28aa82a}\label{namespaceserver_a43e48d45560e05a17f4716d8b28aa82a}} 
+\index{server@{server}!debug@{debug}}
+\index{debug@{debug}!server@{server}}
+\doxysubsubsection{\texorpdfstring{debug}{debug}}
+{\footnotesize\ttfamily server.\+debug = environ.\+get(\textquotesingle{}\mbox{\hyperlink{namespaceserver_a4f8abe5e41727de7cb88d5f2a826cdcb}{DEBUG}}\textquotesingle{}) or \textquotesingle{}0\textquotesingle{}}
+
+\mbox{\Hypertarget{namespaceserver_a4f8abe5e41727de7cb88d5f2a826cdcb}\label{namespaceserver_a4f8abe5e41727de7cb88d5f2a826cdcb}} 
+\index{server@{server}!DEBUG@{DEBUG}}
+\index{DEBUG@{DEBUG}!server@{server}}
+\doxysubsubsection{\texorpdfstring{DEBUG}{DEBUG}}
+{\footnotesize\ttfamily server.\+DEBUG}
+
+\mbox{\Hypertarget{namespaceserver_a344d5f3d6f899cbece6c7d1944bc4899}\label{namespaceserver_a344d5f3d6f899cbece6c7d1944bc4899}} 
+\index{server@{server}!encoding@{encoding}}
+\index{encoding@{encoding}!server@{server}}
+\doxysubsubsection{\texorpdfstring{encoding}{encoding}}
+{\footnotesize\ttfamily server.\+encoding}
+
+\mbox{\Hypertarget{namespaceserver_addb76dcb1b81da9cf62eb9849b07211a}\label{namespaceserver_addb76dcb1b81da9cf62eb9849b07211a}} 
+\index{server@{server}!format@{format}}
+\index{format@{format}!server@{server}}
+\doxysubsubsection{\texorpdfstring{format}{format}}
+{\footnotesize\ttfamily server.\+format}
+
+\mbox{\Hypertarget{namespaceserver_a0024bd723af2e8fbdfbbeb569770a1d5}\label{namespaceserver_a0024bd723af2e8fbdfbbeb569770a1d5}} 
+\index{server@{server}!JWT\_SECRET@{JWT\_SECRET}}
+\index{JWT\_SECRET@{JWT\_SECRET}!server@{server}}
+\doxysubsubsection{\texorpdfstring{JWT\_SECRET}{JWT\_SECRET}}
+{\footnotesize\ttfamily server.\+JWT\+\_\+\+SECRET}
+
+\mbox{\Hypertarget{namespaceserver_ae0362f7d7e03199b2fb92f705b5efd32}\label{namespaceserver_ae0362f7d7e03199b2fb92f705b5efd32}} 
+\index{server@{server}!port@{port}}
+\index{port@{port}!server@{server}}
+\doxysubsubsection{\texorpdfstring{port}{port}}
+{\footnotesize\ttfamily server.\+port}
+
+\mbox{\Hypertarget{namespaceserver_a97beaf52d165c36b96255c1d4f247308}\label{namespaceserver_a97beaf52d165c36b96255c1d4f247308}} 
+\index{server@{server}!r@{r}}
+\index{r@{r}!server@{server}}
+\doxysubsubsection{\texorpdfstring{r}{r}}
+{\footnotesize\ttfamily server.\+r}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 =  requests.get(}
+\DoxyCodeLine{2     \textcolor{stringliteral}{"{}https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system"{}}}
+\DoxyCodeLine{3     \textcolor{stringliteral}{"{}.gserviceaccount.com"{}}}
+\DoxyCodeLine{4 )}
+
+\end{DoxyCode}

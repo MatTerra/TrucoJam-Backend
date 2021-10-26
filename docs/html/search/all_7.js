@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['game_0',['Game',['../classutils_1_1entity_1_1game_1_1_game.html',1,'utils::entity::game']]],
+  ['game_2epy_1',['game.py',['../game_8py.html',1,'']]],
+  ['game_5falready_5fstarted_5fexception_2epy_2',['game_already_started_exception.py',['../game__already__started__exception_8py.html',1,'']]],
+  ['game_5fapi_2epy_3',['game_api.py',['../game__api_8py.html',1,'']]],
+  ['game_5fdao_2epy_4',['game_dao.py',['../game__dao_8py.html',1,'']]],
+  ['game_5fdoesnt_5fexist_5fresponse_5',['game_doesnt_exist_response',['../namespaceutils_1_1controller_1_1game__api.html#a9a54f48d9483e34f3766587113e94a6d',1,'utils::controller::game_api']]],
+  ['game_5fnot_5fready_5fexception_2epy_6',['game_not_ready_exception.py',['../game__not__ready__exception_8py.html',1,'']]],
+  ['game_5fover_5fexception_2epy_7',['game_over_exception.py',['../game__over__exception_8py.html',1,'']]],
+  ['game_5fto_5freturn_8',['game_to_return',['../classutils_1_1entity_1_1game_1_1_game.html#abceaf823745d2ea6bbb81f9a2ac68d96',1,'utils::entity::game::Game']]],
+  ['gamealreadystartedexception_9',['GameAlreadyStartedException',['../classutils_1_1exceptions_1_1game__already__started__exception_1_1_game_already_started_exception.html',1,'utils::exceptions::game_already_started_exception']]],
+  ['gamedao_10',['GameDAO',['../classutils_1_1database_1_1game__dao_1_1_game_d_a_o.html',1,'utils::database::game_dao']]],
+  ['gamenotreadyexception_11',['GameNotReadyException',['../classutils_1_1exceptions_1_1game__not__ready__exception_1_1_game_not_ready_exception.html',1,'utils::exceptions::game_not_ready_exception']]],
+  ['gameoverexception_12',['GameOverException',['../classutils_1_1exceptions_1_1game__over__exception_1_1_game_over_exception.html',1,'utils::exceptions::game_over_exception']]],
+  ['gamestatus_13',['GameStatus',['../classutils_1_1entity_1_1game_1_1_game.html#aad678c78325589c9e7caecb3d3f7158c',1,'utils.entity.game.Game.GameStatus()'],['../classutils_1_1entity_1_1game_1_1_game_status.html',1,'utils.entity.game.GameStatus']]],
+  ['get_5fcurrent_5fpartida_14',['get_current_partida',['../classutils_1_1entity_1_1game_1_1_game.html#a6476c88632c534bba6b34c41bdeccd8e',1,'utils::entity::game::Game']]],
+  ['get_5fcurrent_5fround_15',['get_current_round',['../classutils_1_1entity_1_1partida_1_1_partida.html#a6570aeb650a4ebf165ffc224a70e2c24',1,'utils::entity::partida::Partida']]],
+  ['get_5fround_5fwinner_16',['get_round_winner',['../classutils_1_1entity_1_1partida_1_1_partida.html#a10ab0535959b6dcdda12d302fc3e78f5',1,'utils::entity::partida::Partida']]]
+];

@@ -1,0 +1,80 @@
+\hypertarget{namespaceutils_1_1controller_1_1partida__api}{}\doxysection{utils.\+controller.\+partida\+\_\+api Namespace Reference}
+\label{namespaceutils_1_1controller_1_1partida__api}\index{utils.controller.partida\_api@{utils.controller.partida\_api}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1partida__api_a5f0d9a91d7a4a7ff35b6bf77d1a719f0}{read}} (str id\+\_\+, dict token\+\_\+info=None, \mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} dao=None)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1partida__api_a6d7ab5581755bd3d6e5a988bcded5dcc}{play}} (str id\+\_\+, dict card, dict token\+\_\+info=None, \mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} dao=None)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1partida__api_a23d6a7e68bb16244fa501d9caa1bac52}{raise\+\_\+request}} (str id\+\_\+, dict token\+\_\+info=None, \mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} dao=None)
+\item 
+def \mbox{\hyperlink{namespaceutils_1_1controller_1_1partida__api_a4a628ad3f5a055e0aa88617c4f4b7888}{fold}} (str id\+\_\+, str raise\+\_\+response, dict token\+\_\+info=None, \mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} dao=None)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Truco JAM Partida backend controller
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{namespaceutils_1_1controller_1_1partida__api_a4a628ad3f5a055e0aa88617c4f4b7888}\label{namespaceutils_1_1controller_1_1partida__api_a4a628ad3f5a055e0aa88617c4f4b7888}} 
+\index{utils.controller.partida\_api@{utils.controller.partida\_api}!fold@{fold}}
+\index{fold@{fold}!utils.controller.partida\_api@{utils.controller.partida\_api}}
+\doxysubsubsection{\texorpdfstring{fold()}{fold()}}
+{\footnotesize\ttfamily def utils.\+controller.\+partida\+\_\+api.\+fold (\begin{DoxyParamCaption}\item[{str}]{id\+\_\+,  }\item[{str}]{raise\+\_\+response,  }\item[{dict }]{token\+\_\+info = {\ttfamily None},  }\item[{\mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} }]{dao = {\ttfamily None} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Response after a raise request. May only be issued \
+after a raise request. 
+
+:param id_: The Game in which to fold the partida
+:param raise_response: user response from raise request
+:param token_info: The user token claims
+:param dao: The database connection to use.
+:return: Acceptance or denial of raise
+\end{DoxyVerb}
+ \mbox{\Hypertarget{namespaceutils_1_1controller_1_1partida__api_a6d7ab5581755bd3d6e5a988bcded5dcc}\label{namespaceutils_1_1controller_1_1partida__api_a6d7ab5581755bd3d6e5a988bcded5dcc}} 
+\index{utils.controller.partida\_api@{utils.controller.partida\_api}!play@{play}}
+\index{play@{play}!utils.controller.partida\_api@{utils.controller.partida\_api}}
+\doxysubsubsection{\texorpdfstring{play()}{play()}}
+{\footnotesize\ttfamily def utils.\+controller.\+partida\+\_\+api.\+play (\begin{DoxyParamCaption}\item[{str}]{id\+\_\+,  }\item[{dict}]{card,  }\item[{dict }]{token\+\_\+info = {\ttfamily None},  }\item[{\mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} }]{dao = {\ttfamily None} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Play a card from the player hand in the current partida. Only the card \
+id_ must be passed in the card dict. Only works if it is the players turn.
+
+:param id_: The game in which to play a card
+:param card: A dict with the card ID to play (`{"id_": "..."}`)
+:param token_info: The user token claims
+:param dao: The database connection to use.
+:return: The partida after the card being played. (May include AI plays)
+\end{DoxyVerb}
+ \mbox{\Hypertarget{namespaceutils_1_1controller_1_1partida__api_a23d6a7e68bb16244fa501d9caa1bac52}\label{namespaceutils_1_1controller_1_1partida__api_a23d6a7e68bb16244fa501d9caa1bac52}} 
+\index{utils.controller.partida\_api@{utils.controller.partida\_api}!raise\_request@{raise\_request}}
+\index{raise\_request@{raise\_request}!utils.controller.partida\_api@{utils.controller.partida\_api}}
+\doxysubsubsection{\texorpdfstring{raise\_request()}{raise\_request()}}
+{\footnotesize\ttfamily def utils.\+controller.\+partida\+\_\+api.\+raise\+\_\+request (\begin{DoxyParamCaption}\item[{str}]{id\+\_\+,  }\item[{dict }]{token\+\_\+info = {\ttfamily None},  }\item[{\mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} }]{dao = {\ttfamily None} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Raises the stakes for the current partida by 3 points. The player may \
+not raise if the other player hasn't decided to fold or go.
+
+:param id_: The Game in which to raise the partida stakes
+:param token_info: The user token claims
+:param dao: The database connection to use.
+:return: The partida after raise
+\end{DoxyVerb}
+ \mbox{\Hypertarget{namespaceutils_1_1controller_1_1partida__api_a5f0d9a91d7a4a7ff35b6bf77d1a719f0}\label{namespaceutils_1_1controller_1_1partida__api_a5f0d9a91d7a4a7ff35b6bf77d1a719f0}} 
+\index{utils.controller.partida\_api@{utils.controller.partida\_api}!read@{read}}
+\index{read@{read}!utils.controller.partida\_api@{utils.controller.partida\_api}}
+\doxysubsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily def utils.\+controller.\+partida\+\_\+api.\+read (\begin{DoxyParamCaption}\item[{str}]{id\+\_\+,  }\item[{dict }]{token\+\_\+info = {\ttfamily None},  }\item[{\mbox{\hyperlink{classutils_1_1database_1_1game__dao_1_1_game_d_a_o}{Game\+DAO}} }]{dao = {\ttfamily None} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Retrieve partida in progress. This only returns if player is \
+a member of the game. May return Gone if game is over.
+
+:param id_: ID of the game to select the current partida from.
+:param token_info: The user token claims.
+:param dao: The database connection to use.
+:return: The current partida if successful and player in game.
+\end{DoxyVerb}
+ 
