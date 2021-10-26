@@ -185,7 +185,7 @@ class TestPlay():
 
     @staticmethod
     def test_winner_partida_2(partida_vieira2):
-        assert partida_vieira2.get_round_winner(0) == 1
-        assert partida_vieira2.get_round_winner(1) == 0
-        assert partida_vieira2.get_round_winner(2) == 2
+        assert partida_vieira2.get_round_winner(1) == 1
+        assert partida_vieira2.get_round_winner(2) == 0
+        assert partida_vieira2.get_round_winner(3) == 2
 

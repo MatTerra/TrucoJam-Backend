@@ -170,7 +170,7 @@ class Game(Entity):
         :return: The winning team index or None
         """
         winners = [self.jogadores[partida.get_round_winner(round_)]
-                   for round_ in range(ROUNDS_IN_PARTIDA)
+                   for round_ in range(1, ROUNDS_IN_PARTIDA + 1)
                    if partida.get_round_winner(round_)]
 
         win_team = [self.__get_user_team(user) for user in winners]
