@@ -107,6 +107,7 @@ class Game(Entity):
         vencedor = None
         while self.__is_computer_next(partida) and not vencedor:
             if partida.get_current_round() > 3:
+                vencedor = self.__check_partida_winner(partida)
                 break
             partida.play(partida.turno, partida.get_current_round() - 1)
             vencedor = self.__check_partida_winner(partida)
@@ -178,7 +179,7 @@ class Game(Entity):
             if win_team.count(team) == ROUNDS_TO_WIN_PARTIDA:
                 partida.vencedor = team
 
-        if partida.get_current_round() == 4 and not partida.vencedor:
+        if len(partida.get_round_cards(3)) == 4 and partida.vencedor is None:
             if len(win_team) > 0:
                 partida.vencedor = win_team[0]
             else:
@@ -403,8 +404,7 @@ class Game(Entity):
 
     def __create_partida(self):
         self.partidas.append(dict(
-            Partida(maos=self.__generate_player_hands(),
-                    turno=len(self.partidas) % 4)
+            Partida(maos=self.__generate_player_hands())
         ))
 
     def __generate_player_hands(self):

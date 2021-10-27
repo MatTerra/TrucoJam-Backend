@@ -87,7 +87,7 @@ class Partida:
         return (self.turno + 1) % 4
 
     def get_round_winner(self, round):
-        round_cards = self.__get_round_cards(round)
+        round_cards = self.get_round_cards(round)
         valores_cartas = list(map(lambda card: card.valor, round_cards))
 
         if len(round_cards) == 4:
@@ -99,7 +99,7 @@ class Partida:
             return round_cards.index(max(round_cards))
         return None
 
-    def __get_round_cards(self, round):
+    def get_round_cards(self, round):
         maos_ = sum(
             [[Card(Suit(carta.get("naipe")), Value(carta.get("valor"))) for
               carta in mao.get("cartas") if carta.get("rodada") == round]
