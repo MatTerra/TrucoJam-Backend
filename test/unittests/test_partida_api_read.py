@@ -39,7 +39,8 @@ class TestPartidaAPIRead:
                            'may_raise': [True, True],
                            'turno': 0,
                            'valor': 1,
-                           'vencedor': None
+                           'vencedor': None,
+                           "mao_jogador": mao_id_
                        }})
 
     @staticmethod
@@ -79,6 +80,7 @@ class TestPartidaAPIPlay:
         dao_mock.get.assert_called_with(id_=id_)
         assert res == (200, "Card played",
                        {"partida": {
+                           "mao_jogador": mao_id_,
                            'maos': [{
                                "jogador": id_,
                                "cartas": [
@@ -119,11 +121,66 @@ class TestPartidaAPIPlay:
     @staticmethod
     def test_empty_partida_should_return_bad_request(dao_mock):
         game_mock = Mock(Game)
-        game_mock.get_current_partida.return_value = None
+        game_mock.has_current_partida.return_value = False
         dao_mock.get.return_value = game_mock
         res = partida_api.play.__wrapped__(id_=id_,
                                            card={"id_": 0},
                                            token_info=TOKEN_INFO,
                                            dao=dao_mock)
-        game_mock.get_current_partida.assert_called_with(TOKEN_INFO['sub'])
+        game_mock.has_current_partida.assert_called()
+        assert res == (400, "No current partida", {})
+
+    @staticmethod
+    def test_raise(dao_mock, game_with_players_and_hands):
+        dao_mock.get.return_value = game_with_players_and_hands
+        res = partida_api.raise_request.__wrapped__(id_=id_,
+                                                    token_info={
+                                                        **TOKEN_INFO,
+                                                        "sub": id_},
+                                                    dao=dao_mock)
+        assert res == (200, "raise request sent",
+                       {"partida": dict(
+                           game_with_players_and_hands.get_current_partida(id_)
+                       )})
+
+    @staticmethod
+    def test_raise_game_not_found(dao_mock):
+        dao_mock.get.return_value = None
+        res = partida_api.raise_request.__wrapped__(id_=id_,
+                                                    token_info={
+                                                        **TOKEN_INFO,
+                                                        "sub": id_},
+                                                    dao=dao_mock)
+        assert res == (404, "This game doesn't exist", {"id_": id_})
+
+    @staticmethod
+    def test_raise_no_partida(dao_mock, game_with_players):
+        dao_mock.get.return_value = game_with_players
+        res = partida_api.raise_request.__wrapped__(id_=id_,
+                                                    token_info={
+                                                        **TOKEN_INFO,
+                                                        "sub": id_},
+                                                    dao=dao_mock)
+        assert res == (400, "No current partida", {})
+
+    @staticmethod
+    def test_fold_game_not_found(dao_mock):
+        dao_mock.get.return_value = None
+        res = partida_api.fold.__wrapped__(id_=id_,
+                                                    raise_response="fold",
+                                                    token_info={
+                                                        **TOKEN_INFO,
+                                                        "sub": id_},
+                                                    dao=dao_mock)
+        assert res == (404, "This game doesn't exist", {"id_": id_})
+
+    @staticmethod
+    def test_fold_no_partida(dao_mock, game_with_players):
+        dao_mock.get.return_value = game_with_players
+        res = partida_api.fold.__wrapped__(id_=id_,
+                                                    raise_response="fold",
+                                                    token_info={
+                                                        **TOKEN_INFO,
+                                                        "sub": id_},
+                                                    dao=dao_mock)
         assert res == (400, "No current partida", {})

@@ -117,3 +117,40 @@ class TestGameAPI:
         dao_mock.update.assert_called()
         assert res[0] == 200
         assert res[1] == "User joined team"
+
+    @staticmethod
+    def test_join_bot_team(dao_mock: Mock, game):
+        dao_mock.get.return_value = game
+        game.join(TOKEN_INFO.get("sub"), game.senha)
+        res = game_api.join_team_bot.__wrapped__(id_, 1, dao_mock,
+                                                 token_info=TOKEN_INFO)
+
+        print(res)
+        assert "computer1" in res[2]["Game"]["times"][1]
+        dao_mock.update.assert_called()
+        assert res[0] == 200
+        assert res[1] == "Bot joined team"
+
+    @staticmethod
+    def test_remove_bot_team(dao_mock: Mock, game):
+        dao_mock.get.return_value = game
+        game.join(TOKEN_INFO.get("sub"), game.senha)
+        game_api.join_team_bot.__wrapped__(id_, 1, dao_mock,
+                                           token_info=TOKEN_INFO)
+        res = game_api.remove_team_bot.__wrapped__(id_, 1, dao_mock,
+                                                   token_info=TOKEN_INFO)
+
+        print(res)
+        assert "computer1" not in res[2]["Game"]["times"][1]
+        dao_mock.update.assert_called()
+        assert res[0] == 200
+        assert res[1] == "Bot joined team"
+
+    @staticmethod
+    def test_join_bot_team_no_game(dao_mock: Mock, game):
+        dao_mock.get.return_value = None
+        res = game_api.join_team_bot.__wrapped__(id_, 1, dao_mock,
+                                                 token_info=TOKEN_INFO)
+
+        dao_mock.update.assert_not_called()
+        assert res[0] == 404

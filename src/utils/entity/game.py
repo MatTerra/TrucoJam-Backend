@@ -104,16 +104,16 @@ class Game(Entity):
         user_index = self.__get_user_index(user_id_)
         partida.play(user_index, card_id_)
 
-        vencedor = None
-        while self.__is_computer_next(partida) and not vencedor:
+        vencedor = self.check_partida_winner(partida)
+        while self.__is_computer_next(partida) and vencedor is None:
             partida.play(partida.turno, partida.get_current_round() - 1)
-            vencedor = self.__check_partida_winner(partida)
-            if vencedor:
+            vencedor = self.check_partida_winner(partida)
+            if vencedor is not None:
                 break
 
         self.partidas[-1] = dict(partida)
 
-        if vencedor \
+        if vencedor is not None \
                 and self.pontuacao[0] < 12 \
                 and self.pontuacao[1] < 12:
             self.__create_partida()
@@ -131,11 +131,6 @@ class Game(Entity):
         return self.__get_players_in_playing_order()[
             partida.turno].startswith("computer")
 
-    def __create_partida(self):
-        self.partidas.append(dict(
-            Partida(maos=self.__generate_player_hands())
-        ))
-
     def is_user_a_participant(self, user_id_: str) -> bool:
         """
         Checks that the user is part of the game
@@ -144,6 +139,9 @@ class Game(Entity):
         :return: True if user is in game, False otherwise
         """
         return user_id_ in self.jogadores
+
+    def has_current_partida(self):
+        return self.__get_last_partida() is not None
 
     def __get_last_partida(self) -> Optional[Partida]:
         """
@@ -160,24 +158,35 @@ class Game(Entity):
     def __get_players_in_playing_order(self):
         return sum(zip(*self.times), ())
 
-    def __check_partida_winner(self, partida: Partida) -> Optional[int]:
+    def check_partida_winner(self, partida: Partida) -> Optional[int]:
         """
         Checks if the partida has been won by any team. If it has, registers it
         and sums the points
+
         :param partida: Partida to check
         :return: The winning team index or None
         """
-        winners = [self.jogadores[partida.get_round_winner(round_)]
-                   for round_ in range(ROUNDS_IN_PARTIDA)
-                   if partida.get_round_winner(round_)]
-
-        win_team = [self.__get_user_team(user) for user in winners]
+        if partida.get_current_round() < 3:
+            return None
+        players_in_order = self.__get_players_in_playing_order()
+        win_team = [self.__get_user_team(players_in_order[round_winner])
+                    for round_winner
+                    in [partida.get_round_winner(round_)
+                        for round_ in range(1, ROUNDS_IN_PARTIDA + 1)]
+                    if round_winner is not None]
 
         for team in range(TIMES):
             if win_team.count(team) == ROUNDS_TO_WIN_PARTIDA:
                 partida.vencedor = team
+                break
 
-        if partida.vencedor is not None:
+        if len(partida.get_round_cards(3)) == 4 and partida.vencedor is None:
+            if len(win_team) > 0:
+                partida.vencedor = win_team[0]
+            else:
+                partida.vencedor = -1
+
+        if partida.vencedor is not None and partida.vencedor in [0, 1]:
             self.pontuacao[partida.vencedor] += partida.valor
 
         return partida.vencedor
@@ -230,12 +239,16 @@ class Game(Entity):
             self.status = GameStatus.Pronto
 
     def join_team(self, user_id_, team_id_):
-        team = self.__get_user_team(user_id_)
-
         if self.status == GameStatus.Encerrado:
             raise GameOverException(f"User {user_id_} tried to "
                                     f"change team in a game that already "
                                     f"ended.")
+
+        if not self.is_user_a_participant(user_id_):
+            raise UserNotInGameException(f"User {user_id_} not found in "
+                                         f"game {self.id_}.")
+
+        team = self.__get_user_team(user_id_)
 
         if self.__get_last_partida():
             raise GameAlreadyStartedException(f"User {user_id_} tried to "
@@ -258,7 +271,7 @@ class Game(Entity):
         self.__join_team(user_id_, team_id_)
 
     def join_team_bot(self, user_id_: str, team_id_: int):
-        if user_id_ not in self.jogadores:
+        if not self.is_user_a_participant(user_id_):
             raise UserNotInGameException("User tried to join a bot in a "
                                          "game he is not in")
 
@@ -326,11 +339,11 @@ class Game(Entity):
             for time in self.times
         ]
         computers = self.__get_computer_players()[:-1]
+        self.jogadores = [player for player in self.jogadores
+                          if not player.startswith("computer")]
+        self.jogadores.extend(computers)
         for computer in computers:
             for time in range(TIMES):
-                print(
-                    f"{computer} in {time}: "
-                    f"{self.team_should_have_a_bot(time, old_teams, team_id_)}")
                 if self.team_should_have_a_bot(time, old_teams, team_id_):
                     self.__join_team(computer, time)
                     continue
@@ -366,6 +379,7 @@ class Game(Entity):
             else:
                 raise GameNotReadyException("Not all players chose a team")
 
+        self.status = GameStatus.Jogando
         self.__create_partida()
 
     def __all_human_players_are_in_teams(self):
@@ -410,6 +424,10 @@ class Game(Entity):
             for jogador in self.__get_players_in_playing_order()]
         return maos
 
+    def get_player_hand(self, user_id_):
+        return [mao for mao in self.__get_last_partida().maos
+                if mao.get("jogador") == user_id_][0]
+
     def get_current_partida(self, user_id_: str) -> Optional[Partida]:
         """
         Returns the current partida correctly formatted for the player, that
@@ -431,7 +449,7 @@ class Game(Entity):
         if len(self.partidas) == 0:
             return None
 
-        partida = self.__get_last_partida()
+        partida = deepcopy(self.__get_last_partida())
 
         if partida:
             Game.__filter_hands(partida, user_id_)

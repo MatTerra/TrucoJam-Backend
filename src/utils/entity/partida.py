@@ -61,46 +61,57 @@ class Partida:
         return self.maos[user_index]["cartas"]
 
     def get_current_round(self):
-        last_player = (self.turno - 1) % 4
+        for i in range(1, 4):
+            if len(self.get_round_cards(i)) == 4:
+                continue
+            return i
+        return 3
 
-        last_round_last_player = self.__get_user_last_round(last_player)
-        player_last_round = self.__get_user_last_round(self.turno)
-
-        if player_last_round == last_round_last_player:
-            return player_last_round + 1
-
-        return last_round_last_player
+        # last_player = (self.turno - 1) % 4
+        #
+        # last_round_last_player = self.__get_user_last_round(last_player)
+        # player_last_round = self.__get_user_last_round(self.turno)
+        #
+        # if player_last_round == last_round_last_player:
+        #     return player_last_round + 1
+        #
+        # return last_round_last_player
 
     def __get_user_last_round(self, user_id_):
         return max(
             [self.__get_user_card_round(user_id_, card)
              for card in range(3)
-             if
-             self.__get_user_card_round(user_id_, card)],
+             if self.__get_user_card_round(user_id_, card)],
             default=0)
 
     def __get_next_turn(self, round):
         winner = self.get_round_winner(round)
 
-        if winner:
+        if winner in range(4):
             return winner
 
         return (self.turno + 1) % 4
 
     def get_round_winner(self, round):
-        round_cards = self.__get_round_cards(round)
+        round_cards = self.get_round_cards(round)
+        valores_cartas = list(map(lambda card: card.valor, round_cards))
 
         if len(round_cards) == 4:
+
+            if max(valores_cartas) != Value.MANILHA \
+                    and valores_cartas.count(max(valores_cartas)) > 1:
+                return None
+
             return round_cards.index(max(round_cards))
         return None
 
-    def __get_round_cards(self, round):
-        maos_ = [[Card(Suit(carta.get("naipe")), Value(carta.get("valor"))) for
-                  carta in mao.get("cartas") if carta.get("rodada") == round]
-                 for mao in self.maos]
-
-        while [] in maos_:
-            maos_.remove([])
+    def get_round_cards(self, round):
+        maos_ = sum(
+            [[Card(Suit(carta.get("naipe")), Value(carta.get("valor"))) for
+              carta in mao.get("cartas") if carta.get("rodada") == round]
+             for mao in self.maos],
+            []
+        )
 
         return maos_
 
