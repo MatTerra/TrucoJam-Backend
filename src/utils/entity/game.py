@@ -133,11 +133,6 @@ class Game(Entity):
         return self.__get_players_in_playing_order()[
             partida.turno].startswith("computer")
 
-    def __create_partida(self):
-        self.partidas.append(dict(
-            Partida(maos=self.__generate_player_hands())
-        ))
-
     def is_user_a_participant(self, user_id_: str) -> bool:
         """
         Checks that the user is part of the game
@@ -408,7 +403,8 @@ class Game(Entity):
 
     def __create_partida(self):
         self.partidas.append(dict(
-            Partida(maos=self.__generate_player_hands())
+            Partida(maos=self.__generate_player_hands(),
+                    turno=len(self.partidas) % 4)
         ))
 
     def __generate_player_hands(self):

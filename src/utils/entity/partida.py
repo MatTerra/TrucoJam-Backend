@@ -92,7 +92,8 @@ class Partida:
 
         if len(round_cards) == 4:
 
-            if valores_cartas.count(max(valores_cartas)) > 1:
+            if max(valores_cartas) != Value.MANILHA \
+                    and valores_cartas.count(max(valores_cartas)) > 1:
                 return None
 
             return round_cards.index(max(round_cards))

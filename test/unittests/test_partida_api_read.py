@@ -121,11 +121,11 @@ class TestPartidaAPIPlay:
     @staticmethod
     def test_empty_partida_should_return_bad_request(dao_mock):
         game_mock = Mock(Game)
-        game_mock.get_current_partida.return_value = None
+        game_mock.has_current_partida.return_value = False
         dao_mock.get.return_value = game_mock
         res = partida_api.play.__wrapped__(id_=id_,
                                            card={"id_": 0},
                                            token_info=TOKEN_INFO,
                                            dao=dao_mock)
-        game_mock.get_current_partida.assert_called_with(TOKEN_INFO['sub'])
+        game_mock.has_current_partida.assert_called()
         assert res == (400, "No current partida", {})
