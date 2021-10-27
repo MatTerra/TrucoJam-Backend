@@ -87,7 +87,7 @@ class Partida:
     def __get_next_turn(self, round):
         winner = self.get_round_winner(round)
 
-        if winner:
+        if winner in range(4):
             return winner
 
         return (self.turno + 1) % 4
