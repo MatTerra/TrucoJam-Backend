@@ -129,3 +129,58 @@ class TestPartidaAPIPlay:
                                            dao=dao_mock)
         game_mock.has_current_partida.assert_called()
         assert res == (400, "No current partida", {})
+
+    @staticmethod
+    def test_raise(dao_mock, game_with_players_and_hands):
+        dao_mock.get.return_value = game_with_players_and_hands
+        res = partida_api.raise_request.__wrapped__(id_=id_,
+                                                    token_info={
+                                                        **TOKEN_INFO,
+                                                        "sub": id_},
+                                                    dao=dao_mock)
+        assert res == (200, "raise request sent",
+                       {"partida": dict(
+                           game_with_players_and_hands.get_current_partida(id_)
+                       )})
+
+    @staticmethod
+    def test_raise_game_not_found(dao_mock):
+        dao_mock.get.return_value = None
+        res = partida_api.raise_request.__wrapped__(id_=id_,
+                                                    token_info={
+                                                        **TOKEN_INFO,
+                                                        "sub": id_},
+                                                    dao=dao_mock)
+        assert res == (404, "This game doesn't exist", {"id_": id_})
+
+    @staticmethod
+    def test_raise_no_partida(dao_mock, game_with_players):
+        dao_mock.get.return_value = game_with_players
+        res = partida_api.raise_request.__wrapped__(id_=id_,
+                                                    token_info={
+                                                        **TOKEN_INFO,
+                                                        "sub": id_},
+                                                    dao=dao_mock)
+        assert res == (400, "No current partida", {})
+
+    @staticmethod
+    def test_fold_game_not_found(dao_mock):
+        dao_mock.get.return_value = None
+        res = partida_api.fold.__wrapped__(id_=id_,
+                                                    raise_response="fold",
+                                                    token_info={
+                                                        **TOKEN_INFO,
+                                                        "sub": id_},
+                                                    dao=dao_mock)
+        assert res == (404, "This game doesn't exist", {"id_": id_})
+
+    @staticmethod
+    def test_fold_no_partida(dao_mock, game_with_players):
+        dao_mock.get.return_value = game_with_players
+        res = partida_api.fold.__wrapped__(id_=id_,
+                                                    raise_response="fold",
+                                                    token_info={
+                                                        **TOKEN_INFO,
+                                                        "sub": id_},
+                                                    dao=dao_mock)
+        assert res == (400, "No current partida", {})
