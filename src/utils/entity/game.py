@@ -104,19 +104,16 @@ class Game(Entity):
         user_index = self.__get_user_index(user_id_)
         partida.play(user_index, card_id_)
 
-        vencedor = None
-        while self.__is_computer_next(partida) and not vencedor:
-            if partida.get_current_round() > 3:
-                vencedor = self.__check_partida_winner(partida)
-                break
+        vencedor = self.check_partida_winner(partida)
+        while self.__is_computer_next(partida) and vencedor is None:
             partida.play(partida.turno, partida.get_current_round() - 1)
-            vencedor = self.__check_partida_winner(partida)
-            if vencedor:
+            vencedor = self.check_partida_winner(partida)
+            if vencedor is not None:
                 break
 
         self.partidas[-1] = dict(partida)
 
-        if vencedor \
+        if vencedor is not None \
                 and self.pontuacao[0] < 12 \
                 and self.pontuacao[1] < 12:
             self.__create_partida()
@@ -161,7 +158,7 @@ class Game(Entity):
     def __get_players_in_playing_order(self):
         return sum(zip(*self.times), ())
 
-    def __check_partida_winner(self, partida: Partida) -> Optional[int]:
+    def check_partida_winner(self, partida: Partida) -> Optional[int]:
         """
         Checks if the partida has been won by any team. If it has, registers it
         and sums the points
@@ -169,15 +166,19 @@ class Game(Entity):
         :param partida: Partida to check
         :return: The winning team index or None
         """
-        winners = [self.jogadores[partida.get_round_winner(round_)]
-                   for round_ in range(1, ROUNDS_IN_PARTIDA + 1)
-                   if partida.get_round_winner(round_)]
-
-        win_team = [self.__get_user_team(user) for user in winners]
+        if partida.get_current_round() < 3:
+            return None
+        players_in_order = self.__get_players_in_playing_order()
+        win_team = [self.__get_user_team(players_in_order[round_winner])
+                    for round_winner
+                    in [partida.get_round_winner(round_)
+                        for round_ in range(1, ROUNDS_IN_PARTIDA + 1)]
+                    if round_winner is not None]
 
         for team in range(TIMES):
             if win_team.count(team) == ROUNDS_TO_WIN_PARTIDA:
                 partida.vencedor = team
+                break
 
         if len(partida.get_round_cards(3)) == 4 and partida.vencedor is None:
             if len(win_team) > 0:

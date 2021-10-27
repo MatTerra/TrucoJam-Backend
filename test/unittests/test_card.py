@@ -17,4 +17,24 @@ class TestCard:
         assert not Card(naipe=Suit.COPAS, valor=Value.ACE) \
                    < Card(naipe=Suit.PAUS, valor=Value.ACE) \
                and not Card(naipe=Suit.COPAS, valor=Value.ACE) \
-                   > Card(naipe=Suit.PAUS, valor=Value.ACE)
+                       > Card(naipe=Suit.PAUS, valor=Value.ACE)
+
+    @staticmethod
+    def test_may_use_max():
+        cards = [Card(naipe=Suit.COPAS, valor=Value.MANILHA),
+                 Card(naipe=Suit.PAUS, valor=Value.MANILHA),
+                 Card(naipe=Suit.COPAS, valor=Value.ACE),
+                 Card(naipe=Suit.PAUS, valor=Value.ACE)]
+
+        assert max(cards) == Card(naipe=Suit.PAUS, valor=Value.MANILHA)
+
+        cards = [Card(naipe=Suit.COPAS, valor=Value.THREE),
+                 Card(naipe=Suit.PAUS, valor=Value.THREE),
+                 Card(naipe=Suit.COPAS, valor=Value.ACE),
+                 Card(naipe=Suit.PAUS, valor=Value.KING)]
+        valores_cartas = list(map(lambda card: card.valor, cards))
+        if max(valores_cartas) != Value.MANILHA \
+                and valores_cartas.count(max(valores_cartas)) > 1:
+            assert True
+        else:
+            assert False

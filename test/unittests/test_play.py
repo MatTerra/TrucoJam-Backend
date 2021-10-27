@@ -173,7 +173,7 @@ class TestPlay():
                                            dao_mock)
 
         assert res[0] == 200
-        assert game_vieira.partidas[0]["vencedor"] == 1
+        assert game_vieira.partidas[0]["vencedor"] == 0
 
     @staticmethod
     def test_winner_partida_2(partida_vieira2):

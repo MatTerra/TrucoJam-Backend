@@ -61,15 +61,21 @@ class Partida:
         return self.maos[user_index]["cartas"]
 
     def get_current_round(self):
-        last_player = (self.turno - 1) % 4
+        for i in range(1, 4):
+            if len(self.get_round_cards(i)) == 4:
+                continue
+            return i
+        return 3
 
-        last_round_last_player = self.__get_user_last_round(last_player)
-        player_last_round = self.__get_user_last_round(self.turno)
-
-        if player_last_round == last_round_last_player:
-            return player_last_round + 1
-
-        return last_round_last_player
+        # last_player = (self.turno - 1) % 4
+        #
+        # last_round_last_player = self.__get_user_last_round(last_player)
+        # player_last_round = self.__get_user_last_round(self.turno)
+        #
+        # if player_last_round == last_round_last_player:
+        #     return player_last_round + 1
+        #
+        # return last_round_last_player
 
     def __get_user_last_round(self, user_id_):
         return max(
