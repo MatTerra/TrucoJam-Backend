@@ -174,7 +174,7 @@ class Game(Entity):
                    if partida.get_round_winner(round_)]
 
         win_team = [self.__get_user_team(user) for user in winners]
-
+        print(f"{winners}")
         for team in range(TIMES):
             if win_team.count(team) == ROUNDS_TO_WIN_PARTIDA:
                 partida.vencedor = team
