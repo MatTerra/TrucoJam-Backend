@@ -166,6 +166,7 @@ class Game(Entity):
         """
         Checks if the partida has been won by any team. If it has, registers it
         and sums the points
+
         :param partida: Partida to check
         :return: The winning team index or None
         """
@@ -174,12 +175,18 @@ class Game(Entity):
                    if partida.get_round_winner(round_)]
 
         win_team = [self.__get_user_team(user) for user in winners]
-        print(f"{winners}")
+
         for team in range(TIMES):
             if win_team.count(team) == ROUNDS_TO_WIN_PARTIDA:
                 partida.vencedor = team
 
-        if partida.vencedor is not None:
+        if partida.get_current_round() == 4 and not partida.vencedor:
+            if len(win_team) > 0:
+                partida.vencedor = win_team[0]
+            else:
+                partida.vencedor = -1
+
+        if partida.vencedor is not None and partida.vencedor in [0, 1]:
             self.pontuacao[partida.vencedor] += partida.valor
 
         return partida.vencedor

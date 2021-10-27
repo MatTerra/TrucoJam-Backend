@@ -89,6 +89,10 @@ class Partida:
     def get_round_winner(self, round):
         round_cards = self.__get_round_cards(round)
 
+        valores_cartas = list(map(lambda card: card["valor"], round_cards))
+        if valores_cartas.count(max(valores_cartas)) > 1:
+            return None
+
         if len(round_cards) == 4:
             return round_cards.index(max(round_cards))
         return None
