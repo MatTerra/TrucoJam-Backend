@@ -62,7 +62,7 @@ def play(id_: str, card: dict, token_info: dict = None, dao: GameDAO = None):
     if not game:
         return error_response(404, "This game doesn't exist", {"id_": id_})
 
-    if not game.get_current_partida(user_id_):
+    if not game.has_current_partida():
         return error_response(400, "No current partida", {})
 
     partida = game.play(user_id_, card_id_)

@@ -147,6 +147,9 @@ class Game(Entity):
         """
         return user_id_ in self.jogadores
 
+    def has_current_partida(self):
+        return self.__get_last_partida() is not None
+
     def __get_last_partida(self) -> Optional[Partida]:
         """
         Returns the last partida in the partidas list as a Partida object
